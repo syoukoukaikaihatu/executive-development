@@ -30,14 +30,25 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
 .investigation summary{font-weight:750;cursor:pointer}.investigation ul{margin:10px 0 2px;padding-left:22px}.investigation li{margin:6px 0;line-height:1.55}
 .focus{background:#fff7ed;border-left:4px solid #f59e0b;border-radius:8px;padding:10px 12px;margin:10px 0}.focus ul{margin:0}
 
-@media(max-width:780px){.grid{grid-template-columns:1fr}.month-list{grid-template-columns:1fr}.daylist{grid-template-columns:repeat(7,1fr)}.hero h1{font-size:25px}.wrap{padding:11px}}
+
+.external-ai{margin:10px 0;padding:13px;background:#f3f8fd;border:1px solid #d7e7f4;border-radius:11px}
+.external-ai h4{margin:0 0 5px}
+label{display:block;margin:12px 0 6px}
+.record-card{border:1px solid var(--line);border-radius:13px;padding:14px;margin:10px 0;background:#fff}
+.record-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.mini{padding:6px 8px;font-size:11px}
+.record-card p{white-space:pre-wrap;line-height:1.6}
+.backlog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.backlog-item{background:#fff;border:1px solid var(--line);text-align:left;padding:11px;border-radius:11px}
+.backlog-item:hover{background:#f8fbfe;border-color:#9bb5ce}.backlog-item small{display:block;color:var(--muted);margin-top:4px}
+
+@media(max-width:780px){.grid{grid-template-columns:1fr}.month-list{grid-template-columns:1fr}.backlog-grid{grid-template-columns:1fr}.daylist{grid-template-columns:repeat(7,1fr)}.hero h1{font-size:25px}.wrap{padding:11px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.6</h1>
+<h1>経営者育成｜Daily Dashboard Ver.8</h1>
 <p>サイトを開けば「今日何をやるか」が分かる。2026年9月〜2027年8月の毎日学習プログラム。今日の学習＋自社で何を調べるかまで具体化。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
@@ -62,16 +73,45 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
 <h3>今日の操作</h3>
 <div class="row">
 <button class="done" onclick="markDone()">✓ 今日を完了</button>
-<button class="secondary" onclick="copyPrompt()">ChatGPT用文をコピー</button>
+<button class="secondary" onclick="copyPrompt()">今日の学習をChatGPTと進める</button>
 </div>
+<p class="small">開始文をコピーします。このチャットに貼り付けると、今日のテーマ・自社調査項目・ゴールに沿って対話形式の学習を開始できます。</p>
 </section>
 
 <section class="card full" id="note">
-<span class="tag">DAILY NOTE</span>
-<h2>今日の学習メモ</h2>
-<textarea id="dailyNote" rows="7" placeholder="今日学んだこと／自社に当てはめると／疑問／次に確認したいこと"></textarea>
-<div class="row" style="margin-top:8px"><button class="primary" onclick="saveNote()">保存</button></div>
-<p class="small">日付ごとにこのブラウザ内へ保存します。</p>
+<span class="tag">DAILY RECORD</span>
+<h2>今日の学習・自社分析記録</h2>
+<p class="muted">調べた内容はここへ残します。日付ごとに保存され、「学習記録」へ自動反映されます。</p>
+<label><b>① 確認できた事実</b></label>
+<textarea id="noteFact" rows="4" placeholder="資料・数字・公的情報などで確認できた事実"></textarea>
+<label><b>② 自分の仮説・考え</b></label>
+<textarea id="noteHypothesis" rows="4" placeholder="事実から自分はどう考えるか"></textarea>
+<label><b>③ まだ未確認のこと</b></label>
+<textarea id="noteUnknown" rows="3" placeholder="後で確認する数字・資料・疑問点"></textarea>
+<label><b>④ 経営への示唆・次のアクション</b></label>
+<textarea id="noteAction" rows="4" placeholder="だから経営として何を考えるべきか／次に何をするか"></textarea>
+<label><b>自由メモ</b></label>
+<textarea id="dailyNote" rows="4" placeholder="本で学んだこと、ChatGPTとの対話で気づいたこと等"></textarea>
+<div class="row" style="margin-top:8px">
+<button class="primary" onclick="saveNote()">今日の記録を保存</button>
+<button class="secondary" onclick="showRecords()">学習記録を見る</button>
+</div>
+<p class="small">現在はこのブラウザ内（localStorage）に保存されます。GitHubへ内容が公開されることはありません。</p>
+</section>
+
+<section class="card full" id="backlog">
+<span class="tag">BACKLOG</span>
+<h2>やり残し・遡り学習</h2>
+<p class="muted">過去の未完了日をここからいつでも開けます。できなかった日はそのままで問題ありません。</p>
+<div id="backlogList"></div>
+</section>
+
+<section class="card full hidden" id="records">
+<span class="tag">LEARNING ARCHIVE</span>
+<h2>学習記録</h2>
+<p class="muted">日ごとに保存した「事実・仮説・未確認・経営への示唆」を一覧で確認できます。</p>
+<div id="recordList"></div>
+<button class="secondary" onclick="hideRecords()">閉じる</button>
 </section>
 
 <section class="card full" id="roadmap">
@@ -88,7 +128,7 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
 
 <section class="card full">
 <span class="tag">CHATGPT COACH</span>
-<h2>今日のChatGPT開始文</h2>
+<h2>今日専用のChatGPT学習プロンプト</h2>
 <div class="prompt" id="promptBox"></div>
 </section>
 </div>
@@ -341,6 +381,83 @@ function investigationFor(d){
   return {...x, focus};
 }
 
+
+function precisePromptFor(d){
+  const x=investigationFor(d);
+  const internal=x.internal.slice(0,3).map(v=>`・${v}`).join('\n');
+  const ask=x.ask.slice(0,2).map(v=>`・${v}`).join('\n');
+  const external=x.external.slice(0,3).map(v=>`・${v}`).join('\n');
+  const nums=x.numbers.slice(0,4).map(v=>`・${v}`).join('\n');
+
+  return `【経営者育成 Daily Session】
+日付：${d.jp}
+今月：${d.month_title}
+今週：${d.week_title}
+今日のテーマ：${d.topic}
+学習モード：${d.mode}
+目安時間：${d.duration}
+
+私は株式会社ナリコーの経営者候補として、経営判断力を身につけるための1年間の学習を進めています。
+現在の主な実践対象は、
+① 医療系廃棄物の収集運搬・中間処理
+② 成田空港の一般ごみの収集運搬・中間処理
+です。
+
+今日は「${d.topic}」について学習します。
+
+【今日の進め方】
+あなたは講師兼経営コーチとして進行してください。
+最初から完成した答えを提示しないでください。
+まず私に質問し、私自身に仮説を考えさせてください。
+私が回答したら、
+1. 良い点
+2. 抜けている視点
+3. さらに考える質問
+の順番でフィードバックしてください。
+
+必要に応じて、
+・経営者
+・CFO
+・現場責任者
+・営業
+・顧客
+・競合
+の視点から反論してください。
+
+知識説明が必要な場合は、今日のテーマに必要な範囲だけ簡潔に説明し、その後すぐ演習に戻してください。
+
+【今日、自社について確認したいこと】
+＜社内資料・実態＞
+${internal}
+
+＜担当者に聞く候補＞
+${ask}
+
+＜外部情報＞
+${external}
+
+＜確認したい数字＞
+${nums}
+
+ただし、これらを一度に全部調べる必要はありません。
+今日のテーマに最も重要な2～3項目をあなたが選び、なぜ重要か説明してください。
+
+【今日のゴール】
+${d.result}
+
+セッションの最後に必ず、
+①今日理解したこと
+②自社について分かった事実
+③まだ仮説のもの
+④追加で確認すべき情報・数字
+⑤経営への示唆
+⑥次回までの宿題
+の6項目で整理してください。
+
+それでは、今日の学習を開始してください。
+最初の質問を1つだけ出してください。`;
+}
+
 function renderDay(d){
  selectedDate=d.date;
  const isDone=localStorage.getItem('done_'+d.date)==='1';
@@ -354,8 +471,13 @@ function renderDay(d){
  <h3>読む・参照するもの</h3><p>📘 ${d.book}</p>
  <p class="small">月末成果物：${d.output}</p>
  ${isDone?'<p style="color:var(--good);font-weight:800">✓ この日は完了済みです</p>':''}`;
- document.getElementById('promptBox').textContent=d.prompt;
- document.getElementById('dailyNote').value=localStorage.getItem('note_'+d.date)||'';
+ document.getElementById('promptBox').textContent=precisePromptFor(d);
+ const rec=JSON.parse(localStorage.getItem('record_'+d.date)||'{}');
+ document.getElementById('noteFact').value=rec.fact||'';
+ document.getElementById('noteHypothesis').value=rec.hypothesis||'';
+ document.getElementById('noteUnknown').value=rec.unknown||'';
+ document.getElementById('noteAction').value=rec.action||'';
+ document.getElementById('dailyNote').value=rec.memo||localStorage.getItem('note_'+d.date)||'';
  updateProgress();
 }
 
@@ -365,26 +487,115 @@ function renderInvestigation(d){
   return `
   <div class="investigation">
     <span class="tag">SELF COMPANY RESEARCH</span>
-    <h3>自社分析｜今日調べること</h3>
-    ${x.focus.length?`<div class="focus">${li(x.focus)}</div>`:''}
-    <details open><summary>① 社内資料・実態で確認する</summary><ul>${li(x.internal)}</ul></details>
-    <details><summary>② 担当者に聞く</summary><ul>${li(x.ask)}</ul></details>
-    <details><summary>③ 外部情報で調べる</summary><ul>${li(x.external)}</ul></details>
-    <details><summary>④ 最低限集めたい数字</summary><ul>${li(x.numbers)}</ul></details>
-    <p class="small">すべて一日で集める必要はありません。今日はテーマに関係する2～3項目を選び、「事実」「仮説」「未確認」に分けて記録してください。</p>
+    <h3>自社分析｜今日確認すること</h3>
+    ${x.focus.length?`<div class="focus"><ul>${li(x.focus)}</ul></div>`:''}
+    <details open><summary>① 自分で確認する：社内資料・実態</summary><ul>${li(x.internal)}</ul></details>
+    <details><summary>② 最低限確認したい数字</summary><ul>${li(x.numbers)}</ul></details>
+    <div class="external-ai">
+      <h4>③ 外部情報はChatGPTに調べてもらう</h4>
+      <p class="small">検索方法に迷う場合は、自分で検索語を考えなくて大丈夫です。今日のテーマに必要な外部情報をChatGPTに調査させます。</p>
+      <button class="secondary" onclick="copyExternalPrompt()">外部情報の調査をChatGPTに依頼</button>
+    </div>
+    <details><summary>必要な場合だけ：担当者に確認する</summary><ul>${li(x.ask)}</ul>
+      <p class="small">自分で資料・数字を確認しても分からない場合や、現場実態の確認が必要な場合だけ使います。</p>
+    </details>
+    <p class="small">今日はテーマに関係する2～3項目を選び、「事実」「仮説」「未確認」に分けて記録してください。</p>
   </div>`;
+}
+
+
+function externalPromptFor(d){
+  const x=investigationFor(d);
+  const targets=x.external.slice(0,5).map(v=>`・${v}`).join('\n');
+  return `経営者育成プログラムの外部情報調査をお願いします。
+
+【今日のテーマ】
+${d.jp}
+今月：${d.month_title}
+今週：${d.week_title}
+今日：${d.topic}
+
+【主な自社分析対象】
+・医療系廃棄物の収集運搬・中間処理
+・成田空港の一般ごみの収集運搬・中間処理
+
+【今回調べたい外部情報の候補】
+${targets}
+
+検索方法や情報源の選定も含めてお願いします。官公庁・自治体・業界団体・企業公式・統計など信頼性の高い一次情報を優先してください。
+
+結果は、
+①確認できた事実
+②根拠・出典
+③自社事業への影響
+④機会
+⑤脅威
+⑥追加で確認すべき自社情報
+の順で整理してください。
+
+今日のテーマ「${d.topic}」と関係が薄い情報は省いてください。`;
+}
+function copyExternalPrompt(){
+  const d=getTargetDay();
+  navigator.clipboard.writeText(externalPromptFor(d)).then(()=>alert('外部情報調査用の文章をコピーしました。このチャットに貼り付けてください。'));
 }
 
 function showToday(){selectedDate=null;renderDay(getTargetDay());window.scrollTo({top:0,behavior:'smooth'})}
 function markDone(){
- const d=getTargetDay();localStorage.setItem('done_'+d.date,'1');renderDay(d);
+ const d=getTargetDay();localStorage.setItem('done_'+d.date,'1');renderDay(d);renderBacklog();
 }
 function saveNote(){
- const d=getTargetDay();localStorage.setItem('note_'+d.date,document.getElementById('dailyNote').value);alert('今日のメモを保存しました');
+ const d=getTargetDay();
+ const rec={
+   date:d.date,
+   fact:document.getElementById('noteFact').value,
+   hypothesis:document.getElementById('noteHypothesis').value,
+   unknown:document.getElementById('noteUnknown').value,
+   action:document.getElementById('noteAction').value,
+   memo:document.getElementById('dailyNote').value,
+   updated_at:new Date().toISOString()
+ };
+ localStorage.setItem('record_'+d.date,JSON.stringify(rec));
+ localStorage.removeItem('note_'+d.date);
+ alert('今日の学習・自社分析記録を保存しました');
+ renderBacklog();
 }
 function copyPrompt(){
- const d=getTargetDay();navigator.clipboard.writeText(d.prompt).then(()=>alert('ChatGPT用の開始文をコピーしました'));
+ const d=getTargetDay();navigator.clipboard.writeText(precisePromptFor(d)).then(()=>alert('ChatGPT用の開始文をコピーしました'));
 }
+
+function showRecords(){
+  const items=DAYS.map(d=>{
+    try{return {day:d,rec:JSON.parse(localStorage.getItem('record_'+d.date)||'null')}}catch(e){return {day:d,rec:null}}
+  }).filter(x=>x.rec && (x.rec.fact||x.rec.hypothesis||x.rec.unknown||x.rec.action||x.rec.memo)).reverse();
+  document.getElementById('recordList').innerHTML=items.length?items.map(x=>`
+    <div class="record-card">
+      <div class="record-head"><b>${x.day.jp}｜${x.day.topic}</b>
+      <button class="secondary mini" onclick="jumpDay('${x.day.date}')">この日に戻る</button></div>
+      ${x.rec.fact?`<p><strong>事実：</strong>${escapeHtml(x.rec.fact)}</p>`:''}
+      ${x.rec.hypothesis?`<p><strong>仮説：</strong>${escapeHtml(x.rec.hypothesis)}</p>`:''}
+      ${x.rec.unknown?`<p><strong>未確認：</strong>${escapeHtml(x.rec.unknown)}</p>`:''}
+      ${x.rec.action?`<p><strong>経営への示唆：</strong>${escapeHtml(x.rec.action)}</p>`:''}
+      ${x.rec.memo?`<p class="muted"><strong>自由メモ：</strong>${escapeHtml(x.rec.memo)}</p>`:''}
+    </div>`).join(''):'<p class="muted">まだ保存された学習記録はありません。</p>';
+  document.getElementById('records').classList.remove('hidden');
+  document.getElementById('records').scrollIntoView({behavior:'smooth'});
+}
+function hideRecords(){document.getElementById('records').classList.add('hidden');}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function renderBacklog(){
+  const now=todayISO();
+  const missed=DAYS.filter(d=>d.date<now && localStorage.getItem('done_'+d.date)!=='1');
+  const recent=missed.slice(-20).reverse();
+  const box=document.getElementById('backlogList');
+  if(!box) return;
+  box.innerHTML=recent.length?`
+    <p><b>未完了：${missed.length}日</b> <span class="small">直近20件を表示</span></p>
+    <div class="backlog-grid">${recent.map(d=>`<button class="backlog-item" onclick="jumpDay('${d.date}')">
+      <b>${d.jp}</b><small>${d.week_title}｜${d.topic}</small></button>`).join('')}</div>
+  `:'<p style="color:var(--good);font-weight:800">✓ 現在までのやり残しはありません。</p>';
+}
+
 function updateProgress(){
  const completed=DAYS.filter(x=>localStorage.getItem('done_'+x.date)==='1').length;
  document.getElementById('progressText').textContent=`${completed} / ${DAYS.length}日`;
@@ -418,6 +629,6 @@ function closeMonth(){
 function jumpDay(iso){
  const d=DAYS.find(x=>x.date===iso); if(d){renderDay(d);window.scrollTo({top:0,behavior:'smooth'})}
 }
-renderMonths();renderDay(getTargetDay());
+renderMonths();renderDay(getTargetDay());renderBacklog();
 </script>
 </body></html>
