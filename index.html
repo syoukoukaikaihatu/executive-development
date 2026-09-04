@@ -57,18 +57,24 @@ label{display:block;margin:12px 0 6px}
 .future-stock{background:#f8fafc;border:1px solid #e4e7ec;border-radius:12px;padding:12px;margin:10px 0}
 @media(max-width:800px){.finish-conditions,.session-flowline{grid-template-columns:1fr}}
 @media(max-width:780px){.grid{grid-template-columns:1fr}.month-list{grid-template-columns:1fr}.backlog-grid{grid-template-columns:1fr}.daylist{grid-template-columns:repeat(7,1fr)}.hero h1{font-size:25px}.wrap{padding:11px}}
+
+.record-group{background:#fbfdff;border:1px solid #dbe7f1;border-radius:14px;padding:14px;margin:12px 0}.record-group h3,.next-zone h3{margin:0 0 8px}.next-zone{border-top:1px dashed #cfd8e3;margin-top:16px;padding-top:16px}.save-note{margin-top:12px}.workspace-board{scroll-margin-top:12px}.workspace-item{border:1px solid var(--line);border-radius:13px;padding:13px;margin:10px 0;background:#fff}.workspace-item .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.workspace-item .meta2{font-size:11px;color:var(--muted);margin-top:5px}.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.status-btn{padding:6px 8px;font-size:11px}.status-btn.active{background:var(--accent);color:#fff}.previous-homework{background:#fff8e8;border:1px solid #f0d58b;border-radius:14px;padding:13px;margin:12px 0}.previous-homework h3{margin:0 0 7px}.previous-homework p{margin:5px 0}.issue-create{background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:13px;margin:12px 0}.issue-create input,.issue-create select,#checkFilter,.workspace-item select{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:9px;font:inherit;background:#fff}.issue-create .row select{width:auto;min-width:130px}.issue-create textarea{margin:8px 0}.badge-status{display:inline-block;padding:4px 8px;border-radius:999px;background:#f2f4f7;font-size:11px;font-weight:800}.board-empty{color:var(--muted);padding:14px 0}.result-box{background:#f8fafc;border-radius:9px;padding:10px;margin-top:8px;white-space:pre-wrap}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.10</h1>
+<h1>経営者育成｜Daily Dashboard Ver.11</h1>
 <p>サイトを開けば「今日何をやるか」が分かる。2026年9月〜2027年8月の毎日学習プログラム。今日の学習＋自社で何を調べるかまで具体化。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
+<button onclick="showRecords()">学習記録</button>
+<button onclick="showWorkspace('homeworkBoard')">宿題</button>
+<button onclick="showWorkspace('checkBoard')">確認事項</button>
+<button onclick="showWorkspace('issueBoard')">経営課題</button>
 <button onclick="document.getElementById('roadmap').scrollIntoView()">年間ロードマップ</button>
-<button onclick="document.getElementById('note').scrollIntoView()">今日のメモ</button>
 </div>
 </section>
 
@@ -87,7 +93,7 @@ label{display:block;margin:12px 0 6px}
 <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
 <h3>完了したら</h3>
 <div class="row">
-<button class="done" onclick="markDone()">✓ 今日の30分を完了</button>
+<button class="done" onclick="document.querySelector('.completion-panel')?.scrollIntoView({behavior:'smooth'})">✓ 終了条件を確認</button>
 <button class="secondary" onclick="copyPrompt()">今日の学習をChatGPTと進める</button>
 </div>
 <p class="small">開始文をコピーします。このチャットに貼り付けると、今日のテーマ・自社調査項目・ゴールに沿って対話形式の学習を開始できます。</p>
@@ -96,28 +102,56 @@ label{display:block;margin:12px 0 6px}
 <section class="card full" id="note">
 <span class="tag">DAILY RECORD</span>
 <h2>今日の学習・自社分析記録</h2>
-<p class="muted">調べた内容はここへ残します。日付ごとに保存され、「学習記録」へ自動反映されます。</p>
-<label><b>① 確認できた事実</b></label>
-<textarea id="noteFact" rows="4" placeholder="資料・数字・公的情報などで確認できた事実"></textarea>
-<label><b>② 自分の仮説・考え</b></label>
-<textarea id="noteHypothesis" rows="4" placeholder="事実から自分はどう考えるか"></textarea>
-<label><b>③ まだ未確認のこと</b></label>
-<textarea id="noteUnknown" rows="3" placeholder="後で確認する数字・資料・疑問点"></textarea>
+<p class="muted">今日考えた内容を整理します。すべてを今日調べる必要はありません。保存すると「学習記録」「宿題」「確認事項」に自動整理されます。</p>
+<div class="record-group"><h3>今日の学習記録</h3>
+<label><b>① 今日理解したこと</b></label>
+<textarea id="noteUnderstanding" rows="3" placeholder="今日のテーマから理解したこと・気づいたこと"></textarea>
+<label><b>② 自社について確認できた事実</b></label>
+<textarea id="noteFact" rows="4" placeholder="数字・資料・担当者確認など、根拠があるもの"></textarea>
+<label><b>③ 自分の仮説・まだ未確認のこと</b></label>
+<textarea id="noteHypothesis" rows="4" placeholder="現時点で『こうではないか』と考えていること"></textarea>
 <label><b>④ 経営への示唆</b></label>
-<textarea id="noteAction" rows="4" placeholder="今日の学習が経営判断にどうつながるか"></textarea>
+<textarea id="noteAction" rows="4" placeholder="今日の学習を自社の経営判断にどう活かすか"></textarea></div>
+<div class="next-zone"><h3>次につなげる</h3>
 <div class="homework-card"><label><b>⑤ 次回までの宿題｜1つだけ</b></label>
 <textarea id="noteHomework" rows="2" placeholder="次に実際に確認・行動することを1つだけ"></textarea>
-<p class="small">複数見つかっても宿題は原則1つです。</p></div>
+<p class="small">次回のDaily Session冒頭で進捗を確認します。未完了でも次の学習には進めます。</p></div>
 <div class="future-stock"><label><b>⑥ 今後確認すること｜ストック</b></label>
-<textarea id="noteFuture" rows="4" placeholder="調べたい数字／社内資料／担当者確認／外部情報／新しい経営課題"></textarea>
-<p class="small">ここに入れた項目は今日やる必要はありません。</p></div>
+<textarea id="noteFuture" rows="4" placeholder="1行に1項目：調べたい数字／社内資料／担当者確認／外部情報など"></textarea>
+<p class="small">ここに入れた項目は宿題ではありません。関連するテーマで再度取り上げます。</p></div></div>
 <label><b>自由メモ</b></label>
 <textarea id="dailyNote" rows="4" placeholder="本で学んだこと、ChatGPTとの対話で気づいたこと等"></textarea>
 <div class="row" style="margin-top:8px">
 <button class="primary" onclick="saveNote()">今日の記録を保存</button>
 <button class="secondary" onclick="showRecords()">学習記録を見る</button>
+<button class="secondary" onclick="createIssueFromToday()">経営課題として登録</button>
 </div>
-<p class="small">現在はこのブラウザ内（localStorage）に保存されます。GitHubへ内容が公開されることはありません。</p>
+<details class="save-note"><summary>保存について</summary><p class="small">現在はこの端末のブラウザ内（localStorage）に保存されます。GitHubへ学習内容が自動公開されることはありません。ブラウザデータを削除すると記録も消えるため、将来の複数端末利用・共有運用ではデータベース移行を想定します。</p></details>
+</section>
+
+
+<section class="card full workspace-board" id="homeworkBoard">
+<span class="tag">HOMEWORK</span><h2>宿題</h2>
+<p class="muted">Daily Sessionから生まれた「次に実際に確認・行動すること」を管理します。未完了でも学習は止めません。</p>
+<div id="homeworkList"></div>
+</section>
+
+<section class="card full workspace-board" id="checkBoard">
+<span class="tag">CHECK STOCK</span><h2>確認事項</h2>
+<p class="muted">今日すぐやらない数字・資料・論点のストックです。必要なテーマのときに取り出します。</p>
+<div class="row"><select id="checkFilter" onchange="renderCheckItems()"><option value="all">すべて</option><option value="未確認">未確認</option><option value="確認中">確認中</option><option value="確認済">確認済</option><option value="不要">不要</option></select></div>
+<div id="checkList"></div>
+</section>
+
+<section class="card full workspace-board" id="issueBoard">
+<span class="tag">MANAGEMENT ISSUES</span><h2>経営課題・重要テーマ</h2>
+<p class="muted">1日で終わらない中長期の経営テーマを追い続ける場所です。Daily Sessionの論点を自動では登録せず、重要と判断したものだけ登録します。</p>
+<div class="issue-create">
+<input id="issueTitle" placeholder="経営課題のタイトル">
+<textarea id="issueBody" rows="3" placeholder="背景・現状・目標・現在の仮説など"></textarea>
+<div class="row"><select id="issueStatus"><option>検討中</option><option>実行中</option><option>継続監視</option><option>完了</option></select><button class="primary" onclick="addManagementIssue()">＋ 経営課題を追加</button></div>
+</div>
+<div id="issueList"></div>
 </section>
 
 <section class="card full" id="backlog">
@@ -542,16 +576,16 @@ function renderDay(d){
  selectedDate=d.date;
  const isDone=localStorage.getItem('done_'+d.date)==='1';
  document.getElementById('todayContent').innerHTML=isWeekendISO(d.date)?weekendView(d):`
- <h2 class="today-title">${d.jp}</h2><p class="muted">${d.month_title} ／ 今週：${d.week_title} ／ 今日：<b>${d.topic}</b></p>${sessionContractFor(d)}
+ <h2 class="today-title">${d.jp}</h2><p class="muted">${d.month_title} ／ 今週：${d.week_title} ／ 今日：<b>${d.topic}</b></p>${previousHomeworkPanel(d)}${sessionContractFor(d)}
  ${dailyFocusFor(d)}
  <div class="optional-zone"><details><summary><b>詳しい自社分析候補・追加調査を見る</b></summary>${renderInvestigation(d)}</details></div>
  ${completionPanel(d)}
  ${isDone?'<p style="color:var(--good);font-weight:800">✓ この日は完了済みです</p>':''}`;
  document.getElementById('promptBox').textContent=precisePromptFor(d);
  const rec=JSON.parse(localStorage.getItem('record_'+d.date)||'{}');
+ document.getElementById('noteUnderstanding').value=rec.understanding||'';
  document.getElementById('noteFact').value=rec.fact||'';
  document.getElementById('noteHypothesis').value=rec.hypothesis||'';
- document.getElementById('noteUnknown').value=rec.unknown||'';
  document.getElementById('noteAction').value=rec.action||'';
  document.getElementById('noteHomework').value=rec.homework||'';
  document.getElementById('noteFuture').value=rec.future||'';
@@ -625,13 +659,17 @@ function showToday(){selectedDate=null;renderDay(getTargetDay());window.scrollTo
 function markDone(){
  const d=getTargetDay();localStorage.setItem('done_'+d.date,'1');renderDay(d);renderBacklog();
 }
+function loadArray(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return []}}
+function saveArray(key,v){localStorage.setItem(key,JSON.stringify(v))}
+function splitLines(v){return String(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean)}
+function upsertById(arr,item){const i=arr.findIndex(x=>x.id===item.id);if(i>=0)arr[i]={...arr[i],...item};else arr.push(item);return arr}
 function saveNote(){
  const d=getTargetDay();
  const rec={
    date:d.date,
+   understanding:document.getElementById('noteUnderstanding').value,
    fact:document.getElementById('noteFact').value,
    hypothesis:document.getElementById('noteHypothesis').value,
-   unknown:document.getElementById('noteUnknown').value,
    action:document.getElementById('noteAction').value,
    homework:document.getElementById('noteHomework').value,
    future:document.getElementById('noteFuture').value,
@@ -640,8 +678,17 @@ function saveNote(){
  };
  localStorage.setItem('record_'+d.date,JSON.stringify(rec));
  localStorage.removeItem('note_'+d.date);
- alert('今日の学習・自社分析記録を保存しました');
- renderBacklog();
+ let hws=loadArray('homeworks_v11');
+ const hw=rec.homework.trim();
+ const hwId='hw_'+d.date;
+ if(hw){hws=upsertById(hws,{id:hwId,sourceDate:d.date,topic:d.topic,text:hw,status:(hws.find(x=>x.id===hwId)||{}).status||'未着手',result:(hws.find(x=>x.id===hwId)||{}).result||'',createdAt:new Date().toISOString()})}
+ else hws=hws.filter(x=>x.id!==hwId);
+ saveArray('homeworks_v11',hws);
+ let checks=loadArray('checkItems_v11').filter(x=>x.sourceDate!==d.date);
+ splitLines(rec.future).forEach((text,i)=>checks.push({id:`check_${d.date}_${i}`,sourceDate:d.date,topic:d.topic,text,status:'未確認',priority:'中',createdAt:new Date().toISOString()}));
+ saveArray('checkItems_v11',checks);
+ alert('保存しました。学習記録・宿題・確認事項に整理しました。');
+ renderAllWorkspaces(); renderBacklog();
 }
 function copyPrompt(){
  const d=getTargetDay();navigator.clipboard.writeText(precisePromptFor(d)).then(()=>alert('ChatGPT用の開始文をコピーしました'));
@@ -650,14 +697,14 @@ function copyPrompt(){
 function showRecords(){
   const items=DAYS.map(d=>{
     try{return {day:d,rec:JSON.parse(localStorage.getItem('record_'+d.date)||'null')}}catch(e){return {day:d,rec:null}}
-  }).filter(x=>x.rec && (x.rec.fact||x.rec.hypothesis||x.rec.unknown||x.rec.action||x.rec.memo)).reverse();
+  }).filter(x=>x.rec && (x.rec.understanding||x.rec.fact||x.rec.hypothesis||x.rec.action||x.rec.memo)).reverse();
   document.getElementById('recordList').innerHTML=items.length?items.map(x=>`
     <div class="record-card">
       <div class="record-head"><b>${x.day.jp}｜${x.day.topic}</b>
       <button class="secondary mini" onclick="jumpDay('${x.day.date}')">この日に戻る</button></div>
+      ${x.rec.understanding?`<p><strong>理解したこと：</strong>${escapeHtml(x.rec.understanding)}</p>`:''}
       ${x.rec.fact?`<p><strong>事実：</strong>${escapeHtml(x.rec.fact)}</p>`:''}
       ${x.rec.hypothesis?`<p><strong>仮説：</strong>${escapeHtml(x.rec.hypothesis)}</p>`:''}
-      ${x.rec.unknown?`<p><strong>未確認：</strong>${escapeHtml(x.rec.unknown)}</p>`:''}
       ${x.rec.action?`<p><strong>経営への示唆：</strong>${escapeHtml(x.rec.action)}</p>`:''}
       ${x.rec.memo?`<p class="muted"><strong>自由メモ：</strong>${escapeHtml(x.rec.memo)}</p>`:''}
     </div>`).join(''):'<p class="muted">まだ保存された学習記録はありません。</p>';
@@ -666,6 +713,31 @@ function showRecords(){
 }
 function hideRecords(){document.getElementById('records').classList.add('hidden');}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function showWorkspace(id){renderAllWorkspaces();const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+function previousHomeworkPanel(d){
+ const hws=loadArray('homeworks_v11').filter(x=>x.sourceDate<d.date && x.status!=='完了').sort((a,b)=>b.sourceDate.localeCompare(a.sourceDate));
+ if(!hws.length)return '';
+ const x=hws[0];
+ return `<div class="previous-homework"><span class="tag">前回からの確認</span><h3>${escapeHtml(x.text)}</h3><p class="small">元セッション：${escapeHtml(x.sourceDate)}｜${escapeHtml(x.topic||'')}</p><div class="status-row">${['未着手','進行中','完了','保留'].map(st=>`<button class="status-btn ${x.status===st?'active':''}" onclick="setHomeworkStatus('${x.id}','${st}')">${st}</button>`).join('')}</div>${x.status==='完了'?`<div class="result-box">${escapeHtml(x.result||'完了')}</div>`:''}</div>`;
+}
+function setHomeworkStatus(id,status){let a=loadArray('homeworks_v11');const x=a.find(v=>v.id===id);if(!x)return;x.status=status;if(status==='完了'){const r=prompt('確認できたこと・結果を入力してください（空欄でも可）',x.result||'');if(r!==null)x.result=r;x.completedAt=new Date().toISOString()}saveArray('homeworks_v11',a);renderAllWorkspaces();renderDay(getTargetDay());}
+function renderHomeworks(){const box=document.getElementById('homeworkList');if(!box)return;const a=loadArray('homeworks_v11').sort((x,y)=>(x.status==='完了')-(y.status==='完了')||y.sourceDate.localeCompare(x.sourceDate));box.innerHTML=a.length?a.map(x=>`<div class="workspace-item"><div class="head"><div><b>${escapeHtml(x.text)}</b><div class="meta2">${escapeHtml(x.sourceDate)}｜${escapeHtml(x.topic||'')}</div></div><span class="badge-status">${x.status}</span></div><div class="status-row">${['未着手','進行中','完了','保留'].map(st=>`<button class="status-btn ${x.status===st?'active':''}" onclick="setHomeworkStatus('${x.id}','${st}')">${st}</button>`).join('')}</div>${x.result?`<div class="result-box"><b>確認結果：</b> ${escapeHtml(x.result)}</div>`:''}</div>`).join(''):'<div class="board-empty">まだ宿題はありません。</div>';}
+function setCheckStatus(id,status){let a=loadArray('checkItems_v11');const x=a.find(v=>v.id===id);if(x)x.status=status;saveArray('checkItems_v11',a);renderCheckItems();}
+function setCheckPriority(id,p){let a=loadArray('checkItems_v11');const x=a.find(v=>v.id===id);if(x)x.priority=p;saveArray('checkItems_v11',a);renderCheckItems();}
+function renderCheckItems(){const box=document.getElementById('checkList');if(!box)return;const f=document.getElementById('checkFilter')?.value||'all';let a=loadArray('checkItems_v11');if(f!=='all')a=a.filter(x=>x.status===f);box.innerHTML=a.length?a.map(x=>`<div class="workspace-item"><div class="head"><div><b>${escapeHtml(x.text)}</b><div class="meta2">${escapeHtml(x.sourceDate||'')}｜${escapeHtml(x.topic||'')}</div></div><span class="badge-status">重要度 ${x.priority||'中'}</span></div><div class="status-row">${['未確認','確認中','確認済','不要'].map(st=>`<button class="status-btn ${x.status===st?'active':''}" onclick="setCheckStatus('${x.id}','${st}')">${st}</button>`).join('')}<select style="width:auto" onchange="setCheckPriority('${x.id}',this.value)"><option ${x.priority==='高'?'selected':''}>高</option><option ${!x.priority||x.priority==='中'?'selected':''}>中</option><option ${x.priority==='低'?'selected':''}>低</option></select></div></div>`).join(''):'<div class="board-empty">該当する確認事項はありません。</div>';}
+function addManagementIssue(){const title=document.getElementById('issueTitle').value.trim(),body=document.getElementById('issueBody').value.trim(),status=document.getElementById('issueStatus').value;if(!title){alert('経営課題のタイトルを入力してください。');return;}let a=loadArray('managementIssues_v11');a.unshift({id:'issue_'+Date.now(),title,body,status,createdAt:new Date().toISOString(),sourceDate:getTargetDay().date});saveArray('managementIssues_v11',a);document.getElementById('issueTitle').value='';document.getElementById('issueBody').value='';renderIssues();}
+function createIssueFromToday(){const d=getTargetDay();const title=prompt('経営課題のタイトルを入力してください',d.topic+'から見えた経営課題');if(!title)return;const body=document.getElementById('noteAction').value||document.getElementById('noteHypothesis').value||'';let a=loadArray('managementIssues_v11');a.unshift({id:'issue_'+Date.now(),title,body,status:'検討中',createdAt:new Date().toISOString(),sourceDate:d.date});saveArray('managementIssues_v11',a);renderIssues();showWorkspace('issueBoard');}
+function setIssueStatus(id,status){let a=loadArray('managementIssues_v11');const x=a.find(v=>v.id===id);if(x)x.status=status;saveArray('managementIssues_v11',a);renderIssues();}
+function removeIssue(id){if(!confirm('この経営課題を削除しますか？'))return;saveArray('managementIssues_v11',loadArray('managementIssues_v11').filter(x=>x.id!==id));renderIssues();}
+function renderIssues(){const box=document.getElementById('issueList');if(!box)return;const a=loadArray('managementIssues_v11');box.innerHTML=a.length?a.map(x=>`<div class="workspace-item"><div class="head"><div><b>${escapeHtml(x.title)}</b><div class="meta2">登録日 ${String(x.createdAt||'').slice(0,10)}${x.sourceDate?'｜関連 '+escapeHtml(x.sourceDate):''}</div></div><span class="badge-status">${escapeHtml(x.status)}</span></div>${x.body?`<p>${escapeHtml(x.body)}</p>`:''}<div class="status-row">${['検討中','実行中','継続監視','完了'].map(st=>`<button class="status-btn ${x.status===st?'active':''}" onclick="setIssueStatus('${x.id}','${st}')">${st}</button>`).join('')}<button class="status-btn" onclick="removeIssue('${x.id}')">削除</button></div></div>`).join(''):'<div class="board-empty">まだ経営課題は登録されていません。</div>';}
+function migrateLegacyData(){
+ if(localStorage.getItem('v11_migrated'))return;
+ let h=loadArray('homeworks_v11'),c=loadArray('checkItems_v11');
+ DAYS.forEach(d=>{try{const r=JSON.parse(localStorage.getItem('record_'+d.date)||'null');if(!r)return;if(r.homework&& !h.some(x=>x.id==='hw_'+d.date))h.push({id:'hw_'+d.date,sourceDate:d.date,topic:d.topic,text:r.homework,status:'未着手',result:'',createdAt:r.updated_at||new Date().toISOString()});const future=splitLines(r.future||r.unknown||'');future.forEach((text,i)=>{const id=`check_${d.date}_${i}`;if(!c.some(x=>x.id===id))c.push({id,sourceDate:d.date,topic:d.topic,text,status:'未確認',priority:'中',createdAt:r.updated_at||new Date().toISOString()})});if(!r.understanding&&r.unknown){r.hypothesis=[r.hypothesis,r.unknown].filter(Boolean).join('\n');delete r.unknown;localStorage.setItem('record_'+d.date,JSON.stringify(r));}}catch(e){}});
+ saveArray('homeworks_v11',h);saveArray('checkItems_v11',c);localStorage.setItem('v11_migrated','1');
+}
+function renderAllWorkspaces(){renderHomeworks();renderCheckItems();renderIssues();}
+
 function renderBacklog(){
   const now=todayISO();
   const missed=DAYS.filter(d=>d.date<now && !isWeekendISO(d.date) && localStorage.getItem('done_'+d.date)!=='1');
@@ -713,6 +785,6 @@ function closeMonth(){
 function jumpDay(iso){
  const d=DAYS.find(x=>x.date===iso); if(d){renderDay(d);window.scrollTo({top:0,behavior:'smooth'})}
 }
-renderMonths();renderDay(getTargetDay());renderBacklog();
+migrateLegacyData();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();
 </script>
 </body></html>
