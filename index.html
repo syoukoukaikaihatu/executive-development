@@ -80,14 +80,26 @@ label{display:block;margin:12px 0 6px}
 .issue-stock{border-left:4px solid #f79009;background:#fffcf5;border-radius:10px;padding:12px;margin:8px 0}
 @media(max-width:850px){.v11-quicknav{grid-template-columns:1fr 1fr}.analysis-grid{grid-template-columns:1fr}}
 
+
+/* Ver.12 ChatGPT import + business records */
+.import-box{background:#f3f8fd;border:1px solid #cfe0ef;border-radius:14px;padding:14px;margin:14px 0}
+.import-box textarea{background:#fff}.import-help{font-size:12px;color:var(--muted);line-height:1.6}
+.business-record-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.business-record-tabs button{background:#fff;border:1px solid var(--line);color:#344054}
+.business-record-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.business-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.business-summary .sum{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px}
+.business-summary .sum b{font-size:20px;display:block}
+@media(max-width:700px){.business-summary{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.11 統合版</h1>
-<p>平日30分のDaily Sessionを軸に、9月2日の既存記録・宿題・確認事項を保持しながら、全事業分析と振り返りDBを統合。</p>
+<h1>経営者育成｜Daily Dashboard Ver.12</h1>
+<p>ChatGPTで学ぶ → まとめを1回貼り付け → 保存。9月2日の既存記録を保持し、事業別に学びを蓄積・振り返る。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
 <button onclick="showRecords()">学習記録</button>
@@ -101,7 +113,7 @@ label{display:block;margin:12px 0 6px}
 <div class="v11-quicknav">
  <button onclick="showToday()">TODAY</button>
  <button onclick="document.getElementById('analysisOverview').scrollIntoView({behavior:'smooth'})">事業分析</button>
- <button onclick="document.getElementById('learningDatabase').scrollIntoView({behavior:'smooth'})">学習DB</button>
+ <button onclick="document.getElementById('businessRecords').scrollIntoView({behavior:'smooth'})">事業別記録</button>
  <button onclick="showWorkspace('checkBoard')">確認事項</button>
  <button onclick="document.getElementById('portfolioGoal').scrollIntoView({behavior:'smooth'})">全事業比較</button>
 </div>
@@ -131,6 +143,19 @@ label{display:block;margin:12px 0 6px}
 <span class="tag">DAILY RECORD</span>
 <h2>今日の学習・自社分析記録</h2>
 <p class="muted">今日考えた内容を整理します。すべてを今日調べる必要はありません。保存すると「学習記録」「宿題」「確認事項」に自動整理されます。</p>
+
+<div class="import-box">
+ <span class="tag">CHATGPT IMPORT</span>
+ <h3>ChatGPTの学習結果を取り込む</h3>
+ <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。各項目へ自動で振り分けます。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
+ <textarea id="chatgptImport" rows="7" placeholder='ここにChatGPTのサイト保存用データを貼り付け'></textarea>
+ <div class="row" style="margin-top:8px">
+  <button class="primary" onclick="importChatGPTResult()">ChatGPTのまとめを取り込む</button>
+  <button class="secondary" onclick="document.getElementById('chatgptImport').value=''">クリア</button>
+ </div>
+ <p class="small" id="importStatus"></p>
+</div>
+
 <div class="record-group"><h3>今日の学習記録</h3>
 <div class="row">
  <div style="flex:1;min-width:220px"><label><b>対象事業</b></label>
@@ -234,6 +259,15 @@ label{display:block;margin:12px 0 6px}
   <tr><td>セレモニー</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
   <tr><td>飲食</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
  </tbody></table></div>
+</section>
+
+
+<section class="card full" id="businessRecords">
+ <span class="tag">BUSINESS RECORDS</span><h2>事業別の学習記録</h2>
+ <p class="muted">各事業について、これまで学んだ内容・仮説・経営への示唆・宿題をまとめて振り返る場所です。</p>
+ <div class="business-record-tabs" id="businessRecordTabs"></div>
+ <div id="businessRecordSummary"></div>
+ <div id="businessRecordList"></div>
 </section>
 
 <section class="card full" id="learningDatabase">
@@ -781,7 +815,7 @@ function saveNote(){
    updated_at:new Date().toISOString()
  };
  localStorage.setItem('record_'+d.date,JSON.stringify(rec));
- renderLearningDatabase(); renderFutureStockSummary();
+ renderLearningDatabase(); renderFutureStockSummary(); renderBusinessRecords();
  localStorage.removeItem('note_'+d.date);
  let hws=loadArray('homeworks_v11');
  const hw=rec.homework.trim();
@@ -875,6 +909,59 @@ function seedSep2Session(){
  localStorage.setItem('done_'+date,'1');
 }
 
+
+const BUSINESS_NAMES=['医療系廃棄物','成田空港一般ごみ','空港メンテナンス','土木・建築','セレモニー','飲食','全社・共通'];
+let activeBusinessRecord='医療系廃棄物';
+
+function extractImportJson(raw){
+ let s=(raw||'').trim();
+ const fenced=s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+ if(fenced)s=fenced[1].trim();
+ try{return JSON.parse(s)}catch(e){}
+ const a=s.indexOf('{'), b=s.lastIndexOf('}');
+ if(a>=0&&b>a){try{return JSON.parse(s.slice(a,b+1))}catch(e){}}
+ throw new Error('JSONを読み取れませんでした');
+}
+function importChatGPTResult(){
+ const status=document.getElementById('importStatus');
+ try{
+  const x=extractImportJson(document.getElementById('chatgptImport').value);
+  const allowed=['business','theme','understanding','fact','hypothesis','action','homework','future','memo'];
+  if(x.business && BUSINESS_NAMES.includes(x.business)) document.getElementById('noteBusiness').value=x.business;
+  if(x.theme){
+    const sel=document.getElementById('noteTheme');
+    if([...sel.options].some(o=>o.value===x.theme))sel.value=x.theme;
+  }
+  const map={understanding:'noteUnderstanding',fact:'noteFact',hypothesis:'noteHypothesis',action:'noteAction',homework:'noteHomework',future:'noteFuture',memo:'dailyNote'};
+  Object.entries(map).forEach(([k,id])=>{if(x[k]!==undefined&&x[k]!==null)document.getElementById(id).value=String(x[k])});
+  status.textContent='✓ 取り込みました。内容を確認して「今日の記録を保存」を押してください。';
+  status.style.color='#18794e';
+  document.getElementById('note').scrollIntoView({behavior:'smooth'});
+ }catch(e){
+  status.textContent='取り込めませんでした。ChatGPTが出したJSON全体をコピーして貼り付けてください。';
+  status.style.color='#b42318';
+ }
+}
+function renderBusinessRecordTabs(){
+ const box=document.getElementById('businessRecordTabs'); if(!box)return;
+ box.innerHTML=BUSINESS_NAMES.map(b=>`<button class="${b===activeBusinessRecord?'active':''}" onclick="activeBusinessRecord='${b}';renderBusinessRecords()">${b}</button>`).join('');
+}
+function renderBusinessRecords(){
+ renderBusinessRecordTabs();
+ const sum=document.getElementById('businessRecordSummary'), box=document.getElementById('businessRecordList');
+ if(!sum||!box)return;
+ const rows=allDailyRecords().filter(x=>inferBusiness(x.rec,x.day)===activeBusinessRecord).reverse();
+ const facts=rows.filter(x=>x.rec.fact).length, hyps=rows.filter(x=>x.rec.hypothesis).length, actions=rows.filter(x=>x.rec.action).length, home=rows.filter(x=>x.rec.homework).length;
+ sum.innerHTML=`<h3>${activeBusinessRecord}</h3><div class="business-summary"><div class="sum"><b>${rows.length}</b><small>学習記録</small></div><div class="sum"><b>${facts}</b><small>事実記録</small></div><div class="sum"><b>${hyps}</b><small>仮説記録</small></div><div class="sum"><b>${actions}</b><small>経営示唆</small></div></div>`;
+ box.innerHTML=rows.length?rows.map(x=>`<div class="db-record"><div class="record-head"><b>${x.day.jp}｜${x.day.topic}</b><button class="secondary mini" onclick="jumpDay('${x.day.date}')">この日に戻る</button></div><small>${inferTheme(x.rec,x.day)}</small>
+ ${x.rec.understanding?`<p><strong>理解：</strong>${escapeHtml(x.rec.understanding)}</p>`:''}
+ ${x.rec.fact?`<p><strong>事実：</strong>${escapeHtml(x.rec.fact)}</p>`:''}
+ ${x.rec.hypothesis?`<p><strong>仮説：</strong>${escapeHtml(x.rec.hypothesis)}</p>`:''}
+ ${x.rec.action?`<p><strong>経営への示唆：</strong>${escapeHtml(x.rec.action)}</p>`:''}
+ ${x.rec.homework?`<p><strong>宿題：</strong>${escapeHtml(x.rec.homework)}</p>`:''}
+ ${x.rec.future?`<p><strong>今後確認：</strong>${escapeHtml(x.rec.future)}</p>`:''}</div>`).join(''):'<p class="muted">この事業の学習記録はまだありません。</p>';
+}
+
 function allDailyRecords(){
  return DAYS.map(d=>{let rec=null;try{rec=JSON.parse(localStorage.getItem('record_'+d.date)||'null')}catch(e){}
    return rec?{day:d,rec}:null}).filter(Boolean);
@@ -965,6 +1052,6 @@ function closeMonth(){
 function jumpDay(iso){
  const d=DAYS.find(x=>x.date===iso); if(d){renderDay(d);window.scrollTo({top:0,behavior:'smooth'})}
 }
-migrateLegacyData();seedSep2Session();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();renderLearningDatabase();renderFutureStockSummary();
+migrateLegacyData();seedSep2Session();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();renderLearningDatabase();renderFutureStockSummary();renderBusinessRecords();
 </script>
 </body></html>
