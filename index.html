@@ -120,7 +120,7 @@ label{display:block;margin:12px 0 6px}
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.14</h1>
+<h1>経営者育成｜Daily Dashboard Ver.14.1</h1>
 <p>Daily Session＋成田空港一般ごみ自力演習。演習はChatGPTを経営コーチとして使い、SITE_DATAで事業別記録へ保存。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
@@ -312,7 +312,11 @@ MEMO=自由メモ
    <div><h3 style="margin:0 0 4px">自力演習の進め方</h3><p class="muted" style="margin:0">本人7：ChatGPT3を目安に、自分の仮説→質問→修正→経営示唆まで進めます。</p></div>
    <button class="secondary" onclick="document.getElementById('businessRecords').scrollIntoView({behavior:'smooth'})">保存済み記録を見る</button>
   </div>
-  <div class="practice-list" id="practiceList"></div>
+  <div class="practice-list" id="practiceList">
+  <div class="practice-item"><h4>PEST</h4><p>読み込み中...</p></div>
+  <div class="practice-item"><h4>Five Forces</h4><p>読み込み中...</p></div>
+  <div class="practice-item"><h4>3C</h4><p>読み込み中...</p></div>
+</div>
   <div id="practiceDetail"></div>
  </div>
 </section>
@@ -1177,5 +1181,21 @@ function jumpDay(iso){
  const d=DAYS.find(x=>x.date===iso); if(d){renderDay(d);window.scrollTo({top:0,behavior:'smooth'})}
 }
 migrateLegacyData();seedSep2Session();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();renderLearningDatabase();renderFutureStockSummary();renderBusinessRecords();
+
+function initSelfPracticeModule(){
+  try{
+    renderPracticeList();
+  }catch(e){
+    console.error('Self Practice init error', e);
+    const box=document.getElementById('practiceList');
+    if(box) box.innerHTML='<p class="muted">自力演習メニューの読み込みに失敗しました。ページを再読み込みしてください。</p>';
+  }
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', initSelfPracticeModule);
+}else{
+  initSelfPracticeModule();
+}
+
 </script>
 </body></html>
