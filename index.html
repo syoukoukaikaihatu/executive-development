@@ -98,7 +98,7 @@ label{display:block;margin:12px 0 6px}
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.12</h1>
+<h1>経営者育成｜Daily Dashboard Ver.12.1</h1>
 <p>ChatGPTで学ぶ → まとめを1回貼り付け → 保存。9月2日の既存記録を保持し、事業別に学びを蓄積・振り返る。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
@@ -147,7 +147,7 @@ label{display:block;margin:12px 0 6px}
 <div class="import-box">
  <span class="tag">CHATGPT IMPORT</span>
  <h3>ChatGPTの学習結果を取り込む</h3>
- <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。各項目へ自動で振り分けます。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
+ <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。JSON形式でも、①〜⑥の見出しが付いた通常の保存用データでも取り込めます。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
  <textarea id="chatgptImport" rows="7" placeholder='ここにChatGPTのサイト保存用データを貼り付け'></textarea>
  <div class="row" style="margin-top:8px">
   <button class="primary" onclick="importChatGPTResult()">ChatGPTのまとめを取り込む</button>
@@ -913,6 +913,7 @@ function seedSep2Session(){
 const BUSINESS_NAMES=['医療系廃棄物','成田空港一般ごみ','空港メンテナンス','土木・建築','セレモニー','飲食','全社・共通'];
 let activeBusinessRecord='医療系廃棄物';
 
+
 function extractImportJson(raw){
  let s=(raw||'').trim();
  const fenced=s.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -920,25 +921,63 @@ function extractImportJson(raw){
  try{return JSON.parse(s)}catch(e){}
  const a=s.indexOf('{'), b=s.lastIndexOf('}');
  if(a>=0&&b>a){try{return JSON.parse(s.slice(a,b+1))}catch(e){}}
- throw new Error('JSONを読み取れませんでした');
+ return null;
+}
+function extractLabeledImport(raw){
+ const s=(raw||'').replace(/\r/g,'').trim();
+ const get=(labels)=>{
+   for(const label of labels){
+     const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+     const re=new RegExp('(?:^|\\n)\\s*(?:【)?'+esc+'(?:】)?\\s*[：:]\\s*([\\s\\S]*?)(?=\\n\\s*(?:【)?(?:日付|今月|今週|今日のテーマ|対象事業|事業|分析テーマ|テーマ|①\\s*今日理解したこと|②\\s*自社について確認できた事実|②\\s*確認できた事実|③\\s*自分の仮説・まだ未確認のこと|③\\s*仮説・未確認|④\\s*経営への示唆|⑤\\s*次回までの宿題(?:｜1つだけ)?|⑥\\s*今後確認すること(?:｜ストック)?|自由メモ)\\s*[：:]|$)','i');
+     const m=s.match(re); if(m)return m[1].trim();
+   }
+   return '';
+ };
+ const x={
+   business:get(['対象事業','事業']),
+   theme:get(['分析テーマ','テーマ']),
+   understanding:get(['① 今日理解したこと','①今日理解したこと']),
+   fact:get(['② 自社について確認できた事実','② 確認できた事実','②自社について確認できた事実']),
+   hypothesis:get(['③ 自分の仮説・まだ未確認のこと','③ 仮説・未確認','③自分の仮説・まだ未確認のこと']),
+   action:get(['④ 経営への示唆','④経営への示唆']),
+   homework:get(['⑤ 次回までの宿題｜1つだけ','⑤ 次回までの宿題','⑤次回までの宿題']),
+   future:get(['⑥ 今後確認すること｜ストック','⑥ 今後確認すること','⑥今後確認すること']),
+   memo:get(['自由メモ'])
+ };
+ // Infer classifications from the visible header when older save-data format has no tags.
+ const topic=get(['今日のテーマ']);
+ if(!x.business){
+   if(/医療系廃棄物/.test(s))x.business='医療系廃棄物';
+   else if(/成田空港一般ごみ/.test(s))x.business='成田空港一般ごみ';
+ }
+ if(!x.theme){
+   if(/PEST|外部環境/.test(s)||/経営戦略①/.test(s))x.theme='戦略・外部環境';
+   else if(/Five Forces|5Forces|競争/.test(s))x.theme='競争・強み弱み';
+ }
+ const hasContent=Object.values(x).some(v=>v);
+ if(!hasContent)throw new Error('ラベル形式を読み取れませんでした');
+ return x;
 }
 function importChatGPTResult(){
  const status=document.getElementById('importStatus');
  try{
-  const x=extractImportJson(document.getElementById('chatgptImport').value);
-  const allowed=['business','theme','understanding','fact','hypothesis','action','homework','future','memo'];
-  if(x.business && BUSINESS_NAMES.includes(x.business)) document.getElementById('noteBusiness').value=x.business;
+  const raw=document.getElementById('chatgptImport').value;
+  let x=extractImportJson(raw);
+  if(!x)x=extractLabeledImport(raw);
+  if(x.business && BUSINESS_NAMES.includes(x.business))document.getElementById('noteBusiness').value=x.business;
   if(x.theme){
     const sel=document.getElementById('noteTheme');
     if([...sel.options].some(o=>o.value===x.theme))sel.value=x.theme;
   }
   const map={understanding:'noteUnderstanding',fact:'noteFact',hypothesis:'noteHypothesis',action:'noteAction',homework:'noteHomework',future:'noteFuture',memo:'dailyNote'};
-  Object.entries(map).forEach(([k,id])=>{if(x[k]!==undefined&&x[k]!==null)document.getElementById(id).value=String(x[k])});
-  status.textContent='✓ 取り込みました。内容を確認して「今日の記録を保存」を押してください。';
+  let count=0;
+  Object.entries(map).forEach(([k,id])=>{if(x[k]!==undefined&&x[k]!==null&&String(x[k]).trim()){document.getElementById(id).value=String(x[k]).trim();count++;}});
+  if(!count)throw new Error('記録項目が見つかりませんでした');
+  status.textContent='✓ '+count+'項目を取り込みました。内容を確認して「今日の記録を保存」を押してください。';
   status.style.color='#18794e';
   document.getElementById('note').scrollIntoView({behavior:'smooth'});
  }catch(e){
-  status.textContent='取り込めませんでした。ChatGPTが出したJSON全体をコピーして貼り付けてください。';
+  status.textContent='取り込めませんでした。「サイト保存用データ」全体をコピーして貼り付けてください。';
   status.style.color='#b42318';
  }
 }
