@@ -92,14 +92,20 @@ label{display:block;margin:12px 0 6px}
 .business-summary .sum b{font-size:20px;display:block}
 @media(max-width:700px){.business-summary{grid-template-columns:1fr 1fr}}
 
+
+/* Ver.13 fixed ChatGPT-site protocol */
+#chatgptImport{min-height:250px;max-height:440px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;resize:vertical}
+.protocol-box{background:#101828;color:#f2f4f7;border-radius:12px;padding:12px;margin-top:10px;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
+.import-ok{color:#18794e;font-weight:800}.import-error{color:#b42318;font-weight:800}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.12.2</h1>
-<p>ChatGPTで学ぶ → まとめを1回貼り付け → 保存。9月2日の既存記録を保持し、事業別に学びを蓄積・振り返る。</p>
+<h1>経営者育成｜Daily Dashboard Ver.13</h1>
+<p>ChatGPTとサイトの保存形式を固定。Daily Session → SITE_DATAを1回貼り付け → 確認 → 保存。9月2日の既存記録も継承。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
 <button onclick="showRecords()">学習記録</button>
@@ -147,13 +153,24 @@ label{display:block;margin:12px 0 6px}
 <div class="import-box">
  <span class="tag">CHATGPT IMPORT</span>
  <h3>ChatGPTの学習結果を取り込む</h3>
- <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。JSON形式でも、①〜⑥の見出し形式でも取り込めます。見出しの表記ゆれにも対応し、解析できない文章も自由メモとして保持します。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
+ <p class="import-help">Daily Session終了時にChatGPTが出した <b>===SITE_DATA_START=== から ===SITE_DATA_END=== まで</b>をそのままコピーして貼り付けてください。サイトは固定キーだけを読み取るため、文章の長さや内容に左右されません。</p>
  <textarea id="chatgptImport" rows="7" placeholder='ここにChatGPTのサイト保存用データを貼り付け'></textarea>
  <div class="row" style="margin-top:8px">
   <button class="primary" onclick="importChatGPTResult()">ChatGPTのまとめを取り込む</button>
   <button class="secondary" onclick="document.getElementById('chatgptImport').value=''">クリア</button>
  </div>
  <p class="small" id="importStatus"></p>
+<details><summary>取り込み形式を確認</summary><div class="protocol-box">===SITE_DATA_START===
+BUSINESS=医療系廃棄物
+THEME=戦略・外部環境
+UNDERSTANDING=今日理解したこと
+FACT=確認できた事実
+HYPOTHESIS=仮説・未確認
+ACTION=経営への示唆
+HOMEWORK=次回までの宿題1つ
+FUTURE=今後確認すること
+MEMO=自由メモ
+===SITE_DATA_END===</div></details>
 </div>
 
 <div class="record-group"><h3>今日の学習記録</h3>
@@ -653,6 +670,26 @@ ${d.result}
 ⑥次回までの宿題
 の6項目で整理してください。
 
+【サイト保存用データ｜必須】
+上記の通常まとめに続けて、必ず次の固定形式も出力してください。
+キー名・=・START/ENDの文字列は変更しないでください。
+各値が長い場合は複数行でも構いません。
+
+===SITE_DATA_START===
+BUSINESS=対象事業
+THEME=分析テーマ
+UNDERSTANDING=今日理解したこと
+FACT=自社について確認できた事実
+HYPOTHESIS=自分の仮説・まだ未確認のこと
+ACTION=経営への示唆
+HOMEWORK=次回までの宿題を1つ
+FUTURE=今後確認すること
+MEMO=自由メモ
+===SITE_DATA_END===
+
+BUSINESSは「医療系廃棄物／成田空港一般ごみ／空港メンテナンス／土木・建築／セレモニー／飲食／全社・共通」から選んでください。
+ユーザーはSTARTからENDまでをそのままコピーしてサイトへ貼り付けます。
+
 それでは、今日の学習を開始してください。
 最初の質問を1つだけ出してください。`;
 }
@@ -914,87 +951,46 @@ const BUSINESS_NAMES=['医療系廃棄物','成田空港一般ごみ','空港メ
 let activeBusinessRecord='医療系廃棄物';
 
 
-function extractImportJson(raw){
- let s=(raw||'').trim();
- const fenced=s.match(/```(?:json)?\s*([\s\S]*?)```/i);
- if(fenced)s=fenced[1].trim();
- try{return JSON.parse(s)}catch(e){}
- const a=s.indexOf('{'), b=s.lastIndexOf('}');
- if(a>=0&&b>a){try{return JSON.parse(s.slice(a,b+1))}catch(e){}}
- return null;
-}
-function extractLabeledImport(raw){
- const s=(raw||'').replace(/\r/g,'').trim();
- if(!s)throw new Error('データが空です');
-
- // 見出しの表記ゆれを吸収し、次の見出しまでを値として取得する。
- const defs=[
-  ['understanding',/^(?:①\s*)?(?:今日理解したこと|理解したこと)\s*[：:]?\s*(.*)$/],
-  ['fact',/^(?:②\s*)?(?:自社について)?(?:確認できた事実|分かった事実)\s*[：:]?\s*(.*)$/],
-  ['hypothesis',/^(?:③\s*)?(?:自分の)?(?:仮説・まだ未確認のこと|仮説・未確認|仮説・考え)\s*[：:]?\s*(.*)$/],
-  ['action',/^(?:④\s*)?経営への示唆\s*[：:]?\s*(.*)$/],
-  ['homework',/^(?:⑤\s*)?次回までの宿題(?:｜1つだけ)?\s*[：:]?\s*(.*)$/],
-  ['future',/^(?:⑥\s*)?今後確認すること(?:｜ストック)?\s*[：:]?\s*(.*)$/],
-  ['memo',/^自由メモ\s*[：:]?\s*(.*)$/],
-  ['business',/^(?:対象事業|事業)\s*[：:]\s*(.*)$/],
-  ['theme',/^(?:分析テーマ|テーマ|今日のテーマ)\s*[：:]\s*(.*)$/]
- ];
- const x={business:'',theme:'',understanding:'',fact:'',hypothesis:'',action:'',homework:'',future:'',memo:''};
- let current=null;
- for(const original of s.split('\n')){
-   const line=original.trim();
-   if(!line)continue;
-   if(/^【.*サイト保存用データ.*】$/.test(line)||/^日付\s*[：:]/.test(line)||/^今月\s*[：:]/.test(line)||/^今週\s*[：:]/.test(line))continue;
-   let matched=false;
-   for(const [key,re] of defs){
-     const m=line.match(re);
-     if(m){
-       current=key;
-       const v=(m[1]||'').trim();
-       if(v)x[key]=(x[key]?x[key]+'\n':'')+v;
-       matched=true; break;
-     }
+function parseSiteData(raw){
+ const s=(raw||'').replace(/\r/g,'');
+ const a=s.indexOf('===SITE_DATA_START==='), b=s.indexOf('===SITE_DATA_END===');
+ if(a<0||b<0||b<=a)throw new Error('START_END_MISSING');
+ const body=s.slice(a+'===SITE_DATA_START==='.length,b).trim();
+ const allowed=['BUSINESS','THEME','UNDERSTANDING','FACT','HYPOTHESIS','ACTION','HOMEWORK','FUTURE','MEMO'];
+ const data={}; let current=null;
+ for(const original of body.split('\n')){
+   const line=original;
+   const m=line.match(/^([A-Z_]+)=(.*)$/);
+   if(m && allowed.includes(m[1])){
+     current=m[1]; data[current]=(m[2]||'').trim();
+   }else if(current){
+     // Multi-line text belongs to the previous key until the next KEY=
+     data[current]+=(data[current]?'\n':'')+line.trim();
    }
-   if(!matched && current)x[current]+=(x[current]?'\n':'')+line;
  }
- // 分類がない旧フォーマットは本文・ヘッダーから推定
- if(!x.business){
-   if(/医療系廃棄物/.test(s))x.business='医療系廃棄物';
-   else if(/成田空港一般ごみ/.test(s))x.business='成田空港一般ごみ';
- }
- if(!x.theme){
-   if(/PEST|外部環境|経営戦略①/.test(s))x.theme='戦略・外部環境';
-   else if(/Five Forces|5Forces|競争/.test(s))x.theme='競争・強み弱み';
- }
- // 最悪でも貼付内容を自由メモとして失わない
- const contentKeys=['understanding','fact','hypothesis','action','homework','future','memo'];
- if(!contentKeys.some(k=>x[k])){
-   x.memo=s.replace(/^【.*サイト保存用データ.*】\s*/,'').trim();
- }
- return x;
+ if(!Object.keys(data).length)throw new Error('NO_KEYS');
+ return data;
 }
 function importChatGPTResult(){
- const status=document.getElementById('importStatus');
+ const status=document.getElementById('importStatus'), raw=document.getElementById('chatgptImport').value;
  try{
-  const raw=document.getElementById('chatgptImport').value;
-  let x=extractImportJson(raw);
-  if(!x)x=extractLabeledImport(raw);
-  if(x.business && BUSINESS_NAMES.includes(x.business))document.getElementById('noteBusiness').value=x.business;
-  if(x.theme){
-    const sel=document.getElementById('noteTheme');
-    if([...sel.options].some(o=>o.value===x.theme))sel.value=x.theme;
+  const x=parseSiteData(raw);
+  if(x.BUSINESS && BUSINESS_NAMES.includes(x.BUSINESS))document.getElementById('noteBusiness').value=x.BUSINESS;
+  if(x.THEME){
+   const sel=document.getElementById('noteTheme');
+   if([...sel.options].some(o=>o.value===x.THEME))sel.value=x.THEME;
   }
-  const map={understanding:'noteUnderstanding',fact:'noteFact',hypothesis:'noteHypothesis',action:'noteAction',homework:'noteHomework',future:'noteFuture',memo:'dailyNote'};
+  const map={UNDERSTANDING:'noteUnderstanding',FACT:'noteFact',HYPOTHESIS:'noteHypothesis',ACTION:'noteAction',HOMEWORK:'noteHomework',FUTURE:'noteFuture',MEMO:'dailyNote'};
   let count=0;
-  Object.entries(map).forEach(([k,id])=>{if(x[k]!==undefined&&x[k]!==null&&String(x[k]).trim()){document.getElementById(id).value=String(x[k]).trim();count++;}});
-  if(!count && raw.trim()){document.getElementById('dailyNote').value=raw.trim();count=1;}
-  if(!count)throw new Error('記録項目が見つかりませんでした');
-  status.textContent='✓ '+count+'項目を取り込みました。内容を確認して「今日の記録を保存」を押してください。';
-  status.style.color='#18794e';
-  document.getElementById('note').scrollIntoView({behavior:'smooth'});
+  Object.entries(map).forEach(([key,id])=>{if(x[key]!==undefined){document.getElementById(id).value=x[key];count++;}});
+  if(!count)throw new Error('NO_RECORD_FIELDS');
+  status.className='small import-ok';
+  status.textContent='✓ '+count+'項目を取り込みました。下の内容を確認して「今日の記録を保存」を押してください。';
+  document.querySelector('.record-group')?.scrollIntoView({behavior:'smooth'});
  }catch(e){
-  status.textContent='取り込めませんでした。「サイト保存用データ」全体をコピーして貼り付けてください。';
-  status.style.color='#b42318';
+  status.className='small import-error';
+  if(e.message==='START_END_MISSING')status.textContent='取り込みできません。===SITE_DATA_START=== から ===SITE_DATA_END=== までを含めてコピーしてください。';
+  else status.textContent='取り込みデータを確認できませんでした。固定形式の保存用データをもう一度コピーしてください。';
  }
 }
 function renderBusinessRecordTabs(){
