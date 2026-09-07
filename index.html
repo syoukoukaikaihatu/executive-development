@@ -60,14 +60,34 @@ label{display:block;margin:12px 0 6px}
 
 .record-group{background:#fbfdff;border:1px solid #dbe7f1;border-radius:14px;padding:14px;margin:12px 0}.record-group h3,.next-zone h3{margin:0 0 8px}.next-zone{border-top:1px dashed #cfd8e3;margin-top:16px;padding-top:16px}.save-note{margin-top:12px}.workspace-board{scroll-margin-top:12px}.workspace-item{border:1px solid var(--line);border-radius:13px;padding:13px;margin:10px 0;background:#fff}.workspace-item .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.workspace-item .meta2{font-size:11px;color:var(--muted);margin-top:5px}.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.status-btn{padding:6px 8px;font-size:11px}.status-btn.active{background:var(--accent);color:#fff}.previous-homework{background:#fff8e8;border:1px solid #f0d58b;border-radius:14px;padding:13px;margin:12px 0}.previous-homework h3{margin:0 0 7px}.previous-homework p{margin:5px 0}.issue-create{background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:13px;margin:12px 0}.issue-create input,.issue-create select,#checkFilter,.workspace-item select{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:9px;font:inherit;background:#fff}.issue-create .row select{width:auto;min-width:130px}.issue-create textarea{margin:8px 0}.badge-status{display:inline-block;padding:4px 8px;border-radius:999px;background:#f2f4f7;font-size:11px;font-weight:800}.board-empty{color:var(--muted);padding:14px 0}.result-box{background:#f8fafc;border-radius:9px;padding:10px;margin-top:8px;white-space:pre-wrap}
 
+
+/* Ver.11 merged: business-analysis and searchable learning archive */
+.v11-quicknav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.v11-quicknav button{background:#fff;border:1px solid var(--line);color:var(--accent2);padding:10px 8px}
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.analysis-tile{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff}
+.analysis-tile b{display:block;margin-bottom:5px}.analysis-tile p{font-size:12px;color:var(--muted);margin:0}
+.matrix-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+.matrix{width:100%;border-collapse:collapse;min-width:900px;background:#fff}
+.matrix th,.matrix td{padding:10px 8px;border-bottom:1px solid #edf0f3;text-align:center;font-size:12px}
+.matrix th{background:#f8fafc;color:#344054}.matrix th:first-child,.matrix td:first-child{text-align:left;font-weight:800}
+.deep{font-weight:900;color:#175cd3}.practice{font-weight:900;color:#027a48}.later{color:#667085}
+.archive-filter{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.archive-filter input,.archive-filter select,.record-group select{padding:9px 10px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;font:inherit}
+.archive-filter input{min-width:220px}
+.db-record{border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;background:#fff}
+.db-record small{color:var(--muted)}
+.issue-stock{border-left:4px solid #f79009;background:#fffcf5;border-radius:10px;padding:12px;margin:8px 0}
+@media(max-width:850px){.v11-quicknav{grid-template-columns:1fr 1fr}.analysis-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.11</h1>
-<p>サイトを開けば「今日何をやるか」が分かる。2026年9月〜2027年8月の毎日学習プログラム。今日の学習＋自社で何を調べるかまで具体化。</p>
+<h1>経営者育成｜Daily Dashboard Ver.11 統合版</h1>
+<p>平日30分のDaily Sessionを軸に、9月2日の既存記録・宿題・確認事項を保持しながら、全事業分析と振り返りDBを統合。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
 <button onclick="showRecords()">学習記録</button>
@@ -77,6 +97,14 @@ label{display:block;margin:12px 0 6px}
 <button onclick="document.getElementById('roadmap').scrollIntoView()">年間ロードマップ</button>
 </div>
 </section>
+
+<div class="v11-quicknav">
+ <button onclick="showToday()">TODAY</button>
+ <button onclick="document.getElementById('analysisOverview').scrollIntoView({behavior:'smooth'})">事業分析</button>
+ <button onclick="document.getElementById('learningDatabase').scrollIntoView({behavior:'smooth'})">学習DB</button>
+ <button onclick="showWorkspace('checkBoard')">確認事項</button>
+ <button onclick="document.getElementById('portfolioGoal').scrollIntoView({behavior:'smooth'})">全事業比較</button>
+</div>
 
 <div class="grid">
 <section class="card" id="todayCard">
@@ -104,6 +132,20 @@ label{display:block;margin:12px 0 6px}
 <h2>今日の学習・自社分析記録</h2>
 <p class="muted">今日考えた内容を整理します。すべてを今日調べる必要はありません。保存すると「学習記録」「宿題」「確認事項」に自動整理されます。</p>
 <div class="record-group"><h3>今日の学習記録</h3>
+<div class="row">
+ <div style="flex:1;min-width:220px"><label><b>対象事業</b></label>
+  <select id="noteBusiness" style="width:100%">
+   <option>医療系廃棄物</option><option>成田空港一般ごみ</option><option>空港メンテナンス</option>
+   <option>土木・建築</option><option>セレモニー</option><option>飲食</option><option>全社・共通</option>
+  </select></div>
+ <div style="flex:1;min-width:220px"><label><b>分析テーマ</b></label>
+  <select id="noteTheme" style="width:100%">
+   <option>戦略・外部環境</option><option>競争・強み弱み</option><option>収益構造</option><option>KPI</option>
+   <option>投資</option><option>組織・人材</option><option>マーケティング・価格</option><option>成長・新規事業</option>
+   <option>リスク・DX・撤退</option><option>全社統合</option><option>その他</option>
+  </select></div>
+</div>
+
 <label><b>① 今日理解したこと</b></label>
 <textarea id="noteUnderstanding" rows="3" placeholder="今日のテーマから理解したこと・気づいたこと"></textarea>
 <label><b>② 自社について確認できた事実</b></label>
@@ -167,6 +209,64 @@ label{display:block;margin:12px 0 6px}
 <p class="muted">日ごとに保存した「事実・仮説・未確認・経営への示唆」を一覧で確認できます。</p>
 <div id="recordList"></div>
 <button class="secondary" onclick="hideRecords()">閉じる</button>
+</section>
+
+
+<section class="card full" id="analysisOverview">
+ <span class="tag">BUSINESS ANALYSIS</span><h2>全事業への分析展開</h2>
+ <p class="muted">医療系廃棄物で分析方法を深く学び、成田空港一般ごみで自力演習。その後、他事業へ同じ視点を横展開します。</p>
+ <div class="analysis-grid">
+  <div class="analysis-tile"><b>① 医療系廃棄物</b><p>メインケース｜PEST・Five Forces・3C・強み弱みを深掘り</p></div>
+  <div class="analysis-tile"><b>② 成田空港一般ごみ</b><p>自力演習ケース｜方法を自分で再現</p></div>
+  <div class="analysis-tile"><b>③ 空港メンテナンス</b><p>横展開ケース</p></div>
+  <div class="analysis-tile"><b>④ 土木・建築</b><p>横展開ケース</p></div>
+  <div class="analysis-tile"><b>⑤ セレモニー</b><p>横展開ケース</p></div>
+  <div class="analysis-tile"><b>⑥ 飲食</b><p>横展開ケース</p></div>
+ </div>
+ <h3>事業分析マトリクス</h3>
+ <div class="matrix-wrap"><table class="matrix"><thead><tr>
+  <th>事業</th><th>PEST</th><th>Five Forces</th><th>3C</th><th>強み弱み</th><th>収益構造</th><th>KPI</th><th>将来性・リスク</th><th>経営方針</th>
+ </tr></thead><tbody>
+  <tr><td>医療系廃棄物</td><td class="deep">深掘り</td><td class="deep">深掘り</td><td class="deep">深掘り</td><td class="deep">深掘り</td><td>11月</td><td>12月</td><td>7月</td><td>8月</td></tr>
+  <tr><td>成田空港一般ごみ</td><td class="practice">自力演習</td><td class="practice">自力演習</td><td class="practice">自力演習</td><td class="practice">自力演習</td><td>11月</td><td>12月</td><td>7月</td><td>8月</td></tr>
+  <tr><td>空港メンテナンス</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
+  <tr><td>土木・建築</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
+  <tr><td>セレモニー</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
+  <tr><td>飲食</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td class="later">横展開</td><td>11月〜</td><td>12月〜</td><td>7月</td><td>8月</td></tr>
+ </tbody></table></div>
+</section>
+
+<section class="card full" id="learningDatabase">
+ <span class="tag">LEARNING DATABASE</span><h2>学習記録を振り返る</h2>
+ <p class="muted">保存済みDaily Sessionをキーワード・対象事業・分析テーマで探せます。9月2日の復元記録もここに表示されます。</p>
+ <div class="archive-filter">
+  <input id="dbKeyword" placeholder="例：回収ルート、PEST、処理能力" oninput="renderLearningDatabase()">
+  <select id="dbBusiness" onchange="renderLearningDatabase()"><option value="">すべての事業</option><option>医療系廃棄物</option><option>成田空港一般ごみ</option><option>空港メンテナンス</option><option>土木・建築</option><option>セレモニー</option><option>飲食</option><option>全社・共通</option></select>
+  <select id="dbTheme" onchange="renderLearningDatabase()"><option value="">すべてのテーマ</option><option>戦略・外部環境</option><option>競争・強み弱み</option><option>収益構造</option><option>KPI</option><option>投資</option><option>組織・人材</option><option>マーケティング・価格</option><option>成長・新規事業</option><option>リスク・DX・撤退</option><option>全社統合</option><option>その他</option></select>
+ </div>
+ <div id="learningDatabaseList"></div>
+</section>
+
+<section class="card full" id="futureStockSummary">
+ <span class="tag">OPEN ISSUES</span><h2>今後確認すること｜横断一覧</h2>
+ <p class="muted">各日の「今後確認すること」と未確認論点をまとめて表示します。</p>
+ <div id="futureStockList"></div>
+</section>
+
+<section class="card full" id="portfolioGoal">
+ <span class="tag">PORTFOLIO</span><h2>全事業比較｜年間ゴール</h2>
+ <p class="muted">最終的には各事業を同じ軸で比較し、経営資源の配分と方向性を判断します。</p>
+ <div class="matrix-wrap"><table class="matrix"><thead><tr><th>比較軸</th><th>経営で見ること</th></tr></thead><tbody>
+  <tr><td>収益性</td><td>売上・利益率・キャッシュ創出力</td></tr>
+  <tr><td>成長性</td><td>市場成長・需要・拡大余地</td></tr>
+  <tr><td>安定性</td><td>契約・顧客集中・景気影響</td></tr>
+  <tr><td>競争優位</td><td>選ばれる理由・模倣困難性</td></tr>
+  <tr><td>必要投資</td><td>設備・更新・DX投資</td></tr>
+  <tr><td>人材依存</td><td>資格・採用難・属人性</td></tr>
+  <tr><td>リスク</td><td>法令・事故・災害・信用</td></tr>
+  <tr><td>シナジー</td><td>顧客・設備・人材・ブランド共有</td></tr>
+  <tr><td>方向性</td><td>伸ばす／維持／改善／縮小等</td></tr>
+ </tbody></table></div>
 </section>
 
 <section class="card full" id="roadmap">
@@ -583,6 +683,8 @@ function renderDay(d){
  ${isDone?'<p style="color:var(--good);font-weight:800">✓ この日は完了済みです</p>':''}`;
  document.getElementById('promptBox').textContent=precisePromptFor(d);
  const rec=JSON.parse(localStorage.getItem('record_'+d.date)||'{}');
+ document.getElementById('noteBusiness').value=rec.business||'医療系廃棄物';
+ document.getElementById('noteTheme').value=rec.theme||'戦略・外部環境';
  document.getElementById('noteUnderstanding').value=rec.understanding||'';
  document.getElementById('noteFact').value=rec.fact||'';
  document.getElementById('noteHypothesis').value=rec.hypothesis||'';
@@ -667,6 +769,8 @@ function saveNote(){
  const d=getTargetDay();
  const rec={
    date:d.date,
+   business:document.getElementById('noteBusiness').value,
+   theme:document.getElementById('noteTheme').value,
    understanding:document.getElementById('noteUnderstanding').value,
    fact:document.getElementById('noteFact').value,
    hypothesis:document.getElementById('noteHypothesis').value,
@@ -677,6 +781,7 @@ function saveNote(){
    updated_at:new Date().toISOString()
  };
  localStorage.setItem('record_'+d.date,JSON.stringify(rec));
+ renderLearningDatabase(); renderFutureStockSummary();
  localStorage.removeItem('note_'+d.date);
  let hws=loadArray('homeworks_v11');
  const hw=rec.homework.trim();
@@ -736,6 +841,81 @@ function migrateLegacyData(){
  DAYS.forEach(d=>{try{const r=JSON.parse(localStorage.getItem('record_'+d.date)||'null');if(!r)return;if(r.homework&& !h.some(x=>x.id==='hw_'+d.date))h.push({id:'hw_'+d.date,sourceDate:d.date,topic:d.topic,text:r.homework,status:'未着手',result:'',createdAt:r.updated_at||new Date().toISOString()});const future=splitLines(r.future||r.unknown||'');future.forEach((text,i)=>{const id=`check_${d.date}_${i}`;if(!c.some(x=>x.id===id))c.push({id,sourceDate:d.date,topic:d.topic,text,status:'未確認',priority:'中',createdAt:r.updated_at||new Date().toISOString()})});if(!r.understanding&&r.unknown){r.hypothesis=[r.hypothesis,r.unknown].filter(Boolean).join('\n');delete r.unknown;localStorage.setItem('record_'+d.date,JSON.stringify(r));}}catch(e){}});
  saveArray('homeworks_v11',h);saveArray('checkItems_v11',c);localStorage.setItem('v11_migrated','1');
 }
+function seedSep2Session(){
+ const date='2026-09-02', topic='外部環境と内部環境';
+ const key='record_'+date;
+ let existing=null; try{existing=JSON.parse(localStorage.getItem(key)||'null')}catch(e){}
+ const seed={
+  date,
+  business:'医療系廃棄物',
+  theme:'戦略・外部環境',
+  understanding:`外部環境と内部環境は別々に見るのではなく、つなげて戦略を考える必要がある。\n医療機関の経営悪化・価格競争という外部環境に対し、自社の実績・対応力・処理能力・保管能力などの内部環境を組み合わせて判断する。\nシェアや売上量だけを追うのではなく、限られた処理能力・人員をどの顧客や案件へ配分すると利益を最大化できるかを見ることが重要。`,
+  fact:`・医療系廃棄物では、競争になり他社へ変更された案件が複数ある。\n・収益性を考慮し、既存契約の単価見直し（主に値上げ）を実施している。\n・数年後に新工場への更新を計画しており、新工場の処理能力は現工場と同程度を想定している。\n・既存工場は定期修繕・非常時等のバックアップとして残す方向で検討している。\n・クリーンセンター事業の売上は約50億円、利益は8億円弱。\n・新工場関連の借入想定は100億円、20年返済、固定金利2％想定。\n・自動倉庫の導入を計画している。`,
+  hypothesis:`・ナリコーは競合より価格が高い可能性がある。\n・医療機関が継続契約する理由として、実績、融通の利きやすさ、長年の取引、業者変更の手間が影響している可能性がある。\n・将来のボトルネックは中間処理施設の処理能力と保管能力になる可能性がある。\n・一部の顧客・回収ルートでは採算性が十分に把握されていない可能性がある。\n・県内シェアは約70％との認識があるが、正式な根拠確認が必要。\n・回収ルートの見直しには利益改善余地がある可能性がある。`,
+  action:`医療系廃棄物事業では、単純なシェア拡大・低価格での数量獲得より、既存顧客・回収ルート・処理能力の収益性改善を優先する。\nまず既存の約50億円の売上の中にある「隠れた利益」を把握し、ルート効率化、自動化、予防保全、顧客・案件別採算の改善を進める。そのうえで余力を高採算案件へ配分する。`,
+  homework:`医療系廃棄物の回収ルートが現在どのように決められているか担当者に確認し、ルート別の売上・処理量・距離・時間・人員などのデータが取得可能か確認する。`,
+  future:`処理能力・保管能力と実稼働率を確認する\n主要顧客・ルート別の売上、処理量、単価、採算を確認する\n県内シェア約70％という認識の根拠を確認する\n空港旅客数と成田空港一般ごみ処理量の関係を分析する\n競合事業者の処理施設、許可品目、営業地域、サービス内容を整理する\n新工場稼働後の維持修繕費・固定費・返済余力を確認する`,
+  memo:`9月2日 Daily Session復元記録。外部環境と内部環境をつなぎ、シェア拡大より収益性改善を優先する方向性を検討。`,
+  updated_at:'2026-09-02T23:59:00+09:00', seeded:true
+ };
+ // 既存の9/2記録がある場合は上書きせず、空欄だけ補完する。
+ if(existing){Object.keys(seed).forEach(k=>{if((existing[k]===undefined||existing[k]===null||existing[k]==='')&&seed[k]!==undefined)existing[k]=seed[k]});localStorage.setItem(key,JSON.stringify(existing));}
+ else localStorage.setItem(key,JSON.stringify(seed));
+ const rec=existing||seed;
+ let h=loadArray('homeworks_v11');
+ if(!h.some(x=>x.sourceDate===date))h.push({id:'hw_'+date,sourceDate:date,topic,text:rec.homework,status:'未着手',result:'',createdAt:'2026-09-02T23:59:00+09:00'});
+ saveArray('homeworks_v11',h);
+ let c=loadArray('checkItems_v11');
+ splitLines(rec.future).forEach((text,i)=>{const id=`check_${date}_${i}`;if(!c.some(x=>x.id===id||x.sourceDate===date&&x.text===text))c.push({id,sourceDate:date,topic,text,status:'未確認',priority:i<3?'高':'中',createdAt:'2026-09-02T23:59:00+09:00'})});
+ saveArray('checkItems_v11',c);
+ let issues=loadArray('managementIssues_v11');
+ const iid='issue_clean_center_profitability_20260902';
+ if(!issues.some(x=>x.id===iid||x.title==='クリーンセンター事業の収益力向上'))issues.unshift({id:iid,title:'クリーンセンター事業の収益力向上',body:'現状：売上約50億円・利益8億円弱。目標：利益10億円程度。新工場建設と100億円借入を踏まえ、クリーンセンター事業単独でも返済を支えられる収益構造を目指す。現在の戦略仮説は、単純なシェア拡大より既存事業の収益改善を優先し、回収ルート、自動化、予防保全、顧客・案件別採算を改善すること。',status:'検討中',createdAt:'2026-09-02T23:59:00+09:00',sourceDate:date});
+ saveArray('managementIssues_v11',issues);
+ localStorage.setItem('done_'+date,'1');
+}
+
+function allDailyRecords(){
+ return DAYS.map(d=>{let rec=null;try{rec=JSON.parse(localStorage.getItem('record_'+d.date)||'null')}catch(e){}
+   return rec?{day:d,rec}:null}).filter(Boolean);
+}
+function inferBusiness(rec,day){
+ if(rec.business)return rec.business;
+ if(day && day.date==='2026-09-02')return '医療系廃棄物';
+ return '未分類';
+}
+function inferTheme(rec,day){
+ if(rec.theme)return rec.theme;
+ if(day && day.month_key==='2026-09')return '戦略・外部環境';
+ return '未分類';
+}
+function renderLearningDatabase(){
+ const box=document.getElementById('learningDatabaseList'); if(!box)return;
+ const kw=(document.getElementById('dbKeyword')?.value||'').trim().toLowerCase();
+ const bus=document.getElementById('dbBusiness')?.value||'', theme=document.getElementById('dbTheme')?.value||'';
+ const rows=allDailyRecords().filter(x=>{
+   const b=inferBusiness(x.rec,x.day), t=inferTheme(x.rec,x.day);
+   const text=[x.day.topic,b,t,x.rec.understanding,x.rec.fact,x.rec.hypothesis,x.rec.action,x.rec.homework,x.rec.future,x.rec.memo].filter(Boolean).join('\n').toLowerCase();
+   return (!kw||text.includes(kw))&&(!bus||b===bus)&&(!theme||t===theme);
+ }).reverse();
+ box.innerHTML=rows.length?rows.map(x=>{const b=inferBusiness(x.rec,x.day),t=inferTheme(x.rec,x.day);return `<div class="db-record">
+ <div class="record-head"><b>${x.day.jp}｜${x.day.topic}</b><button class="secondary mini" onclick="jumpDay('${x.day.date}')">この日に戻る</button></div>
+ <small>${b} ｜ ${t}</small>
+ ${x.rec.understanding?`<p><strong>理解：</strong>${escapeHtml(x.rec.understanding)}</p>`:''}
+ ${x.rec.fact?`<p><strong>事実：</strong>${escapeHtml(x.rec.fact)}</p>`:''}
+ ${x.rec.hypothesis?`<p><strong>仮説：</strong>${escapeHtml(x.rec.hypothesis)}</p>`:''}
+ ${x.rec.action?`<p><strong>経営への示唆：</strong>${escapeHtml(x.rec.action)}</p>`:''}
+ ${x.rec.homework?`<p><strong>宿題：</strong>${escapeHtml(x.rec.homework)}</p>`:''}
+ </div>`}).join(''):'<p class="muted">条件に合う学習記録はありません。</p>';
+}
+function renderFutureStockSummary(){
+ const box=document.getElementById('futureStockList'); if(!box)return;
+ const rows=allDailyRecords().filter(x=>x.rec.future||x.rec.hypothesis).reverse();
+ box.innerHTML=rows.length?rows.map(x=>`<div class="issue-stock"><small>${x.day.jp} ｜ ${inferBusiness(x.rec,x.day)}</small>
+ ${x.rec.future?`<p><b>今後確認：</b>${escapeHtml(x.rec.future)}</p>`:''}
+ ${x.rec.hypothesis?`<p><b>仮説・未確認：</b>${escapeHtml(x.rec.hypothesis)}</p>`:''}</div>`).join(''):'<p class="muted">現在ストックはありません。</p>';
+}
+
 function renderAllWorkspaces(){renderHomeworks();renderCheckItems();renderIssues();}
 
 function renderBacklog(){
@@ -785,6 +965,6 @@ function closeMonth(){
 function jumpDay(iso){
  const d=DAYS.find(x=>x.date===iso); if(d){renderDay(d);window.scrollTo({top:0,behavior:'smooth'})}
 }
-migrateLegacyData();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();
+migrateLegacyData();seedSep2Session();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();renderLearningDatabase();renderFutureStockSummary();
 </script>
 </body></html>
