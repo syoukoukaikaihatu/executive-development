@@ -98,7 +98,7 @@ label{display:block;margin:12px 0 6px}
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.12.1</h1>
+<h1>経営者育成｜Daily Dashboard Ver.12.2</h1>
 <p>ChatGPTで学ぶ → まとめを1回貼り付け → 保存。9月2日の既存記録を保持し、事業別に学びを蓄積・振り返る。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
@@ -147,7 +147,7 @@ label{display:block;margin:12px 0 6px}
 <div class="import-box">
  <span class="tag">CHATGPT IMPORT</span>
  <h3>ChatGPTの学習結果を取り込む</h3>
- <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。JSON形式でも、①〜⑥の見出しが付いた通常の保存用データでも取り込めます。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
+ <p class="import-help">Daily Session終了時にChatGPTが出した「サイト保存用データ」をそのまま貼り付けてください。JSON形式でも、①〜⑥の見出し形式でも取り込めます。見出しの表記ゆれにも対応し、解析できない文章も自由メモとして保持します。取り込み後に内容を確認して「今日の記録を保存」を押します。</p>
  <textarea id="chatgptImport" rows="7" placeholder='ここにChatGPTのサイト保存用データを貼り付け'></textarea>
  <div class="row" style="margin-top:8px">
   <button class="primary" onclick="importChatGPTResult()">ChatGPTのまとめを取り込む</button>
@@ -925,37 +925,52 @@ function extractImportJson(raw){
 }
 function extractLabeledImport(raw){
  const s=(raw||'').replace(/\r/g,'').trim();
- const get=(labels)=>{
-   for(const label of labels){
-     const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-     const re=new RegExp('(?:^|\\n)\\s*(?:【)?'+esc+'(?:】)?\\s*[：:]\\s*([\\s\\S]*?)(?=\\n\\s*(?:【)?(?:日付|今月|今週|今日のテーマ|対象事業|事業|分析テーマ|テーマ|①\\s*今日理解したこと|②\\s*自社について確認できた事実|②\\s*確認できた事実|③\\s*自分の仮説・まだ未確認のこと|③\\s*仮説・未確認|④\\s*経営への示唆|⑤\\s*次回までの宿題(?:｜1つだけ)?|⑥\\s*今後確認すること(?:｜ストック)?|自由メモ)\\s*[：:]|$)','i');
-     const m=s.match(re); if(m)return m[1].trim();
+ if(!s)throw new Error('データが空です');
+
+ // 見出しの表記ゆれを吸収し、次の見出しまでを値として取得する。
+ const defs=[
+  ['understanding',/^(?:①\s*)?(?:今日理解したこと|理解したこと)\s*[：:]?\s*(.*)$/],
+  ['fact',/^(?:②\s*)?(?:自社について)?(?:確認できた事実|分かった事実)\s*[：:]?\s*(.*)$/],
+  ['hypothesis',/^(?:③\s*)?(?:自分の)?(?:仮説・まだ未確認のこと|仮説・未確認|仮説・考え)\s*[：:]?\s*(.*)$/],
+  ['action',/^(?:④\s*)?経営への示唆\s*[：:]?\s*(.*)$/],
+  ['homework',/^(?:⑤\s*)?次回までの宿題(?:｜1つだけ)?\s*[：:]?\s*(.*)$/],
+  ['future',/^(?:⑥\s*)?今後確認すること(?:｜ストック)?\s*[：:]?\s*(.*)$/],
+  ['memo',/^自由メモ\s*[：:]?\s*(.*)$/],
+  ['business',/^(?:対象事業|事業)\s*[：:]\s*(.*)$/],
+  ['theme',/^(?:分析テーマ|テーマ|今日のテーマ)\s*[：:]\s*(.*)$/]
+ ];
+ const x={business:'',theme:'',understanding:'',fact:'',hypothesis:'',action:'',homework:'',future:'',memo:''};
+ let current=null;
+ for(const original of s.split('\n')){
+   const line=original.trim();
+   if(!line)continue;
+   if(/^【.*サイト保存用データ.*】$/.test(line)||/^日付\s*[：:]/.test(line)||/^今月\s*[：:]/.test(line)||/^今週\s*[：:]/.test(line))continue;
+   let matched=false;
+   for(const [key,re] of defs){
+     const m=line.match(re);
+     if(m){
+       current=key;
+       const v=(m[1]||'').trim();
+       if(v)x[key]=(x[key]?x[key]+'\n':'')+v;
+       matched=true; break;
+     }
    }
-   return '';
- };
- const x={
-   business:get(['対象事業','事業']),
-   theme:get(['分析テーマ','テーマ']),
-   understanding:get(['① 今日理解したこと','①今日理解したこと']),
-   fact:get(['② 自社について確認できた事実','② 確認できた事実','②自社について確認できた事実']),
-   hypothesis:get(['③ 自分の仮説・まだ未確認のこと','③ 仮説・未確認','③自分の仮説・まだ未確認のこと']),
-   action:get(['④ 経営への示唆','④経営への示唆']),
-   homework:get(['⑤ 次回までの宿題｜1つだけ','⑤ 次回までの宿題','⑤次回までの宿題']),
-   future:get(['⑥ 今後確認すること｜ストック','⑥ 今後確認すること','⑥今後確認すること']),
-   memo:get(['自由メモ'])
- };
- // Infer classifications from the visible header when older save-data format has no tags.
- const topic=get(['今日のテーマ']);
+   if(!matched && current)x[current]+=(x[current]?'\n':'')+line;
+ }
+ // 分類がない旧フォーマットは本文・ヘッダーから推定
  if(!x.business){
    if(/医療系廃棄物/.test(s))x.business='医療系廃棄物';
    else if(/成田空港一般ごみ/.test(s))x.business='成田空港一般ごみ';
  }
  if(!x.theme){
-   if(/PEST|外部環境/.test(s)||/経営戦略①/.test(s))x.theme='戦略・外部環境';
+   if(/PEST|外部環境|経営戦略①/.test(s))x.theme='戦略・外部環境';
    else if(/Five Forces|5Forces|競争/.test(s))x.theme='競争・強み弱み';
  }
- const hasContent=Object.values(x).some(v=>v);
- if(!hasContent)throw new Error('ラベル形式を読み取れませんでした');
+ // 最悪でも貼付内容を自由メモとして失わない
+ const contentKeys=['understanding','fact','hypothesis','action','homework','future','memo'];
+ if(!contentKeys.some(k=>x[k])){
+   x.memo=s.replace(/^【.*サイト保存用データ.*】\s*/,'').trim();
+ }
  return x;
 }
 function importChatGPTResult(){
@@ -972,6 +987,7 @@ function importChatGPTResult(){
   const map={understanding:'noteUnderstanding',fact:'noteFact',hypothesis:'noteHypothesis',action:'noteAction',homework:'noteHomework',future:'noteFuture',memo:'dailyNote'};
   let count=0;
   Object.entries(map).forEach(([k,id])=>{if(x[k]!==undefined&&x[k]!==null&&String(x[k]).trim()){document.getElementById(id).value=String(x[k]).trim();count++;}});
+  if(!count && raw.trim()){document.getElementById('dailyNote').value=raw.trim();count=1;}
   if(!count)throw new Error('記録項目が見つかりませんでした');
   status.textContent='✓ '+count+'項目を取り込みました。内容を確認して「今日の記録を保存」を押してください。';
   status.style.color='#18794e';
