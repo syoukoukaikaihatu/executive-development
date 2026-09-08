@@ -48,7 +48,7 @@ label{display:block;margin:12px 0 6px}
 .session-contract{background:#f8fbff;border:1px solid #d7e5f2;border-radius:18px;padding:16px;margin:14px 0}
 .finish-conditions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
 .finish-item{background:#fff;border:1px solid #dfe7ef;border-radius:12px;padding:12px;font-weight:800}
-.session-flowline{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:14px}
+.session-flowline{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:14px}
 .flowbox{text-align:center;background:#fff;border:1px solid #e1e7ed;border-radius:11px;padding:10px 6px;font-size:12px}
 .flowbox b{display:block;color:#1f4e79}.flowbox.complete{background:#eef8f1}
 .completion-panel{background:#eef8f1;border:1px solid #b9dfc5;border-radius:16px;padding:16px;margin:16px 0}
@@ -114,14 +114,26 @@ label{display:block;margin:12px 0 6px}
 .practice-prompt{background:#101828;color:#f2f4f7;border-radius:12px;padding:13px;white-space:pre-wrap;font-size:12px;line-height:1.55;max-height:320px;overflow:auto;margin-top:10px}
 @media(max-width:850px){.practice-list{grid-template-columns:1fr}.practice-steps{grid-template-columns:1fr}}
 
+
+/* Ver.15 ChatGPT business analysis */
+.biz-analysis-shell{border:1px solid #d7e7f4;background:#fbfdff;border-radius:16px;padding:16px;margin:14px 0}
+.biz-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.biz-tabs button{background:#fff;border:1px solid var(--line);color:#344054}
+.biz-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.biz-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.biz-analysis-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px}
+.biz-analysis-card p{font-size:12px;color:var(--muted);min-height:38px}
+.biz-mode-note{background:#eef6fc;border-left:4px solid var(--accent);padding:11px;border-radius:9px;margin:10px 0;font-size:13px}
+@media(max-width:850px){.biz-progress{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.14.1</h1>
-<p>Daily Session＋成田空港一般ごみ自力演習。演習はChatGPTを経営コーチとして使い、SITE_DATAで事業別記録へ保存。</p>
+<h1>経営者育成｜Daily Dashboard Ver.16</h1>
+<p>医療系廃棄物は学びながら実分析→空港一般ごみは自力再現→他4事業はChatGPT壁打ち分析→全6事業比較。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
 <button onclick="showRecords()">学習記録</button>
@@ -135,7 +147,7 @@ label{display:block;margin:12px 0 6px}
 <div class="v11-quicknav">
  <button onclick="showToday()">TODAY</button>
  <button onclick="document.getElementById('analysisOverview').scrollIntoView({behavior:'smooth'})">事業分析</button>
- <button onclick="document.getElementById('businessRecords').scrollIntoView({behavior:'smooth'})">事業別記録</button><button onclick="document.getElementById('selfPractice').scrollIntoView({behavior:'smooth'})">自力演習</button>
+ <button onclick="document.getElementById('businessRecords').scrollIntoView({behavior:'smooth'})">事業別記録</button><button onclick="document.getElementById('selfPractice').scrollIntoView({behavior:'smooth'})">自力演習</button><button onclick="document.getElementById('businessAnalysisMode').scrollIntoView({behavior:'smooth'})">事業分析</button>
  <button onclick="showWorkspace('checkBoard')">確認事項</button>
  <button onclick="document.getElementById('portfolioGoal').scrollIntoView({behavior:'smooth'})">全事業比較</button>
 </div>
@@ -274,12 +286,12 @@ MEMO=自由メモ
  <span class="tag">BUSINESS ANALYSIS</span><h2>全事業への分析展開</h2>
  <p class="muted">医療系廃棄物で分析方法を深く学び、成田空港一般ごみで自力演習。その後、他事業へ同じ視点を横展開します。</p>
  <div class="analysis-grid">
-  <div class="analysis-tile"><b>① 医療系廃棄物</b><p>メインケース｜PEST・Five Forces・3C・強み弱みを深掘り</p></div>
+  <div class="analysis-tile"><b>① 医療系廃棄物</b><p>学習＋実事業分析｜考え方を学びながら本物の分析を積み上げる</p><button class="secondary mini" style="margin-top:8px" onclick="document.getElementById('medicalRealAnalysis').scrollIntoView({behavior:'smooth'})">実事業分析を見る</button></div>
   <div class="analysis-tile"><b>② 成田空港一般ごみ</b><p>自力演習ケース｜専用メニューで方法を自分で再現</p><button class="secondary mini" style="margin-top:8px" onclick="document.getElementById('selfPractice').scrollIntoView({behavior:'smooth'})">自力演習メニュー</button></div>
-  <div class="analysis-tile"><b>③ 空港メンテナンス</b><p>横展開ケース</p></div>
-  <div class="analysis-tile"><b>④ 土木・建築</b><p>横展開ケース</p></div>
-  <div class="analysis-tile"><b>⑤ セレモニー</b><p>横展開ケース</p></div>
-  <div class="analysis-tile"><b>⑥ 飲食</b><p>横展開ケース</p></div>
+  <div class="analysis-tile"><b>③ 空港メンテナンス</b><p>ChatGPT壁打ち型の事業分析</p><button class="secondary mini" style="margin-top:8px" onclick="openBusinessAnalysisSection('空港メンテナンス')">事業分析を開く</button></div>
+  <div class="analysis-tile"><b>④ 土木・建築</b><p>ChatGPT壁打ち型の事業分析</p><button class="secondary mini" style="margin-top:8px" onclick="openBusinessAnalysisSection('土木・建築')">事業分析を開く</button></div>
+  <div class="analysis-tile"><b>⑤ セレモニー</b><p>ChatGPT壁打ち型の事業分析</p><button class="secondary mini" style="margin-top:8px" onclick="openBusinessAnalysisSection('セレモニー')">事業分析を開く</button></div>
+  <div class="analysis-tile"><b>⑥ 飲食</b><p>ChatGPT壁打ち型の事業分析</p><button class="secondary mini" style="margin-top:8px" onclick="openBusinessAnalysisSection('飲食')">事業分析を開く</button></div>
  </div>
  <h3>事業分析マトリクス</h3>
  <div class="matrix-wrap"><table class="matrix"><thead><tr>
@@ -303,6 +315,24 @@ MEMO=自由メモ
  <div id="businessRecordList"></div>
 </section>
 
+
+
+<section class="card full" id="medicalRealAnalysis">
+<span class="tag">LEARN + REAL ANALYSIS</span><h2>医療系廃棄物｜学びながら実事業分析</h2>
+<p class="muted">考え方を学ぶだけで終わらず、その日の学習を実際の医療系廃棄物事業へ適用し、事業分析として積み上げます。</p>
+<div class="biz-analysis-shell"><div class="biz-mode-note"><b>基本サイクル：</b> 考え方を学ぶ → 自分の仮説 → 実際の外部・社内情報を確認 → ナリコーへの影響 → 経営判断 → SITE_DATAで保存</div>
+<div id="medicalAnalysisSummary"></div><div class="biz-progress" id="medicalAnalysisList"></div><div id="medicalAnalysisDetail"></div></div></section>
+<section class="card full" id="businessAnalysisMode">
+ <span class="tag">BUSINESS ANALYSIS</span><h2>他事業｜ChatGPTと事業分析</h2>
+ <p class="muted">空港メンテナンス・土木建築・セレモニー・飲食は、完成した答えを採点するのではなく、ChatGPTとの壁打ちから分析を作ります。</p>
+ <div class="biz-analysis-shell">
+  <div class="biz-mode-note"><b>進め方：</b> 自分の現状認識 → ChatGPTと壁打ち → 必要情報の確認・外部調査 → 自社への影響 → 経営判断 → SITE_DATAで保存</div>
+  <div class="biz-tabs" id="bizAnalysisTabs"></div>
+  <div id="bizAnalysisSummary"></div>
+  <div class="biz-progress" id="bizAnalysisList"></div>
+  <div id="bizAnalysisDetail"></div>
+ </div>
+</section>
 
 <section class="card full" id="selfPractice">
  <span class="tag">SELF PRACTICE</span><h2>成田空港一般ごみ｜自力演習</h2>
@@ -982,6 +1012,101 @@ function seedSep2Session(){
 
 
 
+
+
+function medKey(id){return 'medical_real_analysis_'+id}
+function medStatus(id){return localStorage.getItem(medKey(id))||'未着手'}
+function setMedStatus(id,s){localStorage.setItem(medKey(id),s);renderMedicalAnalysis();if(document.getElementById('medicalAnalysisDetail')?.dataset.id===id)openMedicalAnalysis(id)}
+function medPrompt(p){return `【経営者育成｜学習＋実事業分析】
+対象事業：医療系廃棄物の収集運搬・中間処理
+テーマ：${p.title}
+
+目的：${p.title}の考え方を理解すると同時に、株式会社ナリコーの実際の医療系廃棄物事業を分析する。
+
+あなたは講師兼経営コーチとして進行してください。
+【進め方】
+1. 今回の考え方を経営判断に必要な範囲だけ簡潔に教える
+2. 完成した答えは出さず、私に1問だけ質問して仮説を考えさせる
+3. 回答後は「良い点／抜けている視点／次の1問」で壁打ちする
+4. 実際の制度・市場・顧客・競合など外部情報が必要なら、確認事項を示し必要に応じてWeb調査する
+5. 売上・利益・単価・処理量・ルート・設備・人員など社内情報が必要なら、確認すべき数字を具体化する
+6. 事実と仮説を分ける
+7. 売上・利益・コスト・人員・設備・顧客・競争優位・リスクへの影響を考える
+8. 最後は経営への示唆・判断まで進める
+
+【今回の分析ステップ】
+${p.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}
+
+【重要】
+・フレームワークの暗記で終わらせない
+・架空ケースではなく実際の医療系廃棄物事業を分析する
+・未確認事項は無理に埋めず「今後確認すること」に残す
+・最終成果を後から使える実事業分析にする
+
+===SITE_DATA_START===
+BUSINESS=医療系廃棄物
+THEME=${p.theme}
+UNDERSTANDING=今回学んだ考え方と実事業について理解したこと
+FACT=実際に確認できた事実
+HYPOTHESIS=自分の仮説・まだ未確認のこと
+ACTION=医療系廃棄物事業への経営上の示唆・判断
+HOMEWORK=次回までに確認することを1つ
+FUTURE=今後確認する情報・数字
+MEMO=${p.title}｜学習＋実事業分析
+===SITE_DATA_END===
+
+では、まず${p.title}を経営判断で使うための考え方を簡潔に説明し、その後、最初の質問を1つだけしてください。`}
+
+function renderMedicalAnalysis(){
+ const list=document.getElementById('medicalAnalysisList'),sum=document.getElementById('medicalAnalysisSummary');if(!list||!sum)return;
+ const done=PRACTICE_ITEMS.filter(p=>medStatus(p.id)==='完了').length;
+ sum.innerHTML=`<h3>医療系廃棄物</h3><p class="muted">学習＋実事業分析：${done} / ${PRACTICE_ITEMS.length} 完了</p>`;
+ list.innerHTML=PRACTICE_ITEMS.map(p=>{const s=medStatus(p.id),c=s==='完了'?'done':s==='進行中'?'progress':'';return `<div class="biz-analysis-card"><div class="record-head"><h4>${p.title}</h4><span class="practice-status ${c}">${s}</span></div><p>${p.desc}</p><div class="row"><button class="primary" onclick="openMedicalAnalysis('${p.id}')">学びながら分析する</button><button class="secondary mini" onclick="setMedStatus('${p.id}','${s==='完了'?'未着手':'完了'}')">${s==='完了'?'未着手に戻す':'完了にする'}</button></div></div>`}).join('');
+}
+function openMedicalAnalysis(id){
+ const p=PRACTICE_ITEMS.find(x=>x.id===id);if(!p)return;const box=document.getElementById('medicalAnalysisDetail');box.dataset.id=id;const s=medStatus(id);
+ box.innerHTML=`<div class="practice-detail"><div class="record-head"><div><h3 style="margin:0">医療系廃棄物｜${p.title}</h3><small>考え方の学習＋実際の事業分析</small></div><span class="practice-status ${s==='完了'?'done':s==='進行中'?'progress':''}">${s}</span></div><div class="practice-steps">${p.steps.map((x,i)=>`<div class="practice-step"><b>${i+1}</b> ${x}</div>`).join('')}</div><div class="row" style="margin-top:12px"><button class="primary" onclick="copyMedPrompt('${id}')">ChatGPTで学習＋分析を始める</button><button class="secondary" onclick="setMedStatus('${id}','進行中')">進行中にする</button><button class="done" onclick="setMedStatus('${id}','完了')">完了にする</button></div><div class="practice-prompt">${escapeHtml(medPrompt(p))}</div><p class="small">終了後のSITE_DATAは「事業別の学習記録 → 医療系廃棄物」に保存します。Daily Sessionの内容も実事業分析の材料として蓄積します。</p></div>`;box.scrollIntoView({behavior:'smooth'});
+}
+async function copyMedPrompt(id){const p=PRACTICE_ITEMS.find(x=>x.id===id),t=medPrompt(p);try{await navigator.clipboard.writeText(t);setMedStatus(id,'進行中');alert('学習＋実事業分析プロンプトをコピーしました。')}catch(e){prompt('このプロンプトをコピーしてください',t)}}
+function initMedicalAnalysis(){try{renderMedicalAnalysis()}catch(e){console.error(e)}}
+const ANALYSIS_BUSINESSES=['空港メンテナンス','土木・建築','セレモニー','飲食'];
+let activeAnalysisBusiness='空港メンテナンス';
+function bizAnalysisKey(b,id){return 'businessanalysis_'+b+'_'+id}
+function getBizAnalysisStatus(b,id){return localStorage.getItem(bizAnalysisKey(b,id))||'未着手'}
+function setBizAnalysisStatus(b,id,status){localStorage.setItem(bizAnalysisKey(b,id),status);renderBusinessAnalysisMode();if(document.getElementById('bizAnalysisDetail')?.dataset.id===id)openBusinessAnalysis(id)}
+function renderBizTabs(){
+ const box=document.getElementById('bizAnalysisTabs'); if(!box)return;
+ box.innerHTML=ANALYSIS_BUSINESSES.map(b=>`<button class="${b===activeAnalysisBusiness?'active':''}" onclick="activeAnalysisBusiness='${b}';renderBusinessAnalysisMode()">${b}</button>`).join('');
+}
+function buildBusinessAnalysisPrompt(p){
+ return `【経営者育成｜事業分析モード】\n対象事業：${activeAnalysisBusiness}\n分析テーマ：${p.title}\n\n私は株式会社ナリコーの経営者候補として、この事業を実際の経営判断につながる形で分析します。\nあなたは経営参謀・壁打ち相手として進行してください。\n\n【進め方】\n1. 最初に私の現状認識・仮説を引き出す質問を1つだけする\n2. 私の回答後、「良い点／不足視点／次に考える1問」で壁打ちする\n3. 事実と仮説を分ける\n4. 外部情報が必要なら、官公庁・業界・顧客・競合等の何を調べるべきか示し、必要に応じて調査する\n5. 社内情報が必要なら、売上・利益・顧客・契約・人員・設備・稼働等、確認すべき資料や数字を具体化する\n6. 売上・利益・CF・人材・設備・顧客・競争優位・リスクへの影響まで考える\n7. 最後は「経営として何を判断するか」まで進める\n\n【重要】\n・最初から完成した分析を提示しない\n・私の考えを中心にする\n・ただし自力演習よりも積極的に不足視点・反論・選択肢を提示する\n・必要に応じて経営者/CFO/現場/顧客/競合の立場から問い返す\n・分析をフレームワーク作成だけで終わらせない\n\n【今回の分析ステップ】\n${p.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n【終了時のサイト保存用データ】\n===SITE_DATA_START===\nBUSINESS=${activeAnalysisBusiness}\nTHEME=${p.theme}\nUNDERSTANDING=今回の分析で理解したこと\nFACT=確認できた事実\nHYPOTHESIS=仮説・まだ未確認のこと\nACTION=経営への示唆・判断\nHOMEWORK=次回までに確認することを1つ\nFUTURE=今後確認すること\nMEMO=${p.title}事業分析\n===SITE_DATA_END===\n\nでは、私の現状認識を引き出す最初の質問を1つだけしてください。`;
+}
+function renderBusinessAnalysisMode(){
+ renderBizTabs();
+ const list=document.getElementById('bizAnalysisList'), sum=document.getElementById('bizAnalysisSummary'); if(!list||!sum)return;
+ const done=PRACTICE_ITEMS.filter(p=>getBizAnalysisStatus(activeAnalysisBusiness,p.id)==='完了').length;
+ sum.innerHTML=`<h3>${activeAnalysisBusiness}</h3><p class="muted">分析進捗：${done} / ${PRACTICE_ITEMS.length} 完了</p>`;
+ list.innerHTML=PRACTICE_ITEMS.map(p=>{const st=getBizAnalysisStatus(activeAnalysisBusiness,p.id),cls=st==='完了'?'done':st==='進行中'?'progress':'';return `<div class="biz-analysis-card"><div class="record-head"><h4>${p.title}</h4><span class="practice-status ${cls}">${st}</span></div><p>${p.desc}</p><div class="row"><button class="primary" onclick="openBusinessAnalysis('${p.id}')">ChatGPTと分析する</button><button class="secondary mini" onclick="setBizAnalysisStatus('${activeAnalysisBusiness}','${p.id}','${st==='完了'?'未着手':'完了'}')">${st==='完了'?'未着手に戻す':'完了にする'}</button></div></div>`}).join('');
+ document.getElementById('bizAnalysisDetail').innerHTML='';
+}
+function openBusinessAnalysis(id){
+ const p=PRACTICE_ITEMS.find(x=>x.id===id); if(!p)return;
+ const box=document.getElementById('bizAnalysisDetail');box.dataset.id=id;
+ const st=getBizAnalysisStatus(activeAnalysisBusiness,id);
+ box.innerHTML=`<div class="practice-detail"><div class="record-head"><div><h3 style="margin:0">${activeAnalysisBusiness}｜${p.title}</h3><small>ChatGPT壁打ち型 事業分析</small></div><span class="practice-status ${st==='完了'?'done':st==='進行中'?'progress':''}">${st}</span></div>
+ <div class="practice-steps">${p.steps.map((s,i)=>`<div class="practice-step"><b>${i+1}</b> ${s}</div>`).join('')}</div>
+ <div class="row" style="margin-top:12px"><button class="primary" onclick="copyBusinessAnalysisPrompt('${id}')">分析プロンプトをコピー</button><button class="secondary" onclick="setBizAnalysisStatus('${activeAnalysisBusiness}','${id}','進行中')">進行中にする</button><button class="done" onclick="setBizAnalysisStatus('${activeAnalysisBusiness}','${id}','完了')">完了にする</button></div>
+ <div class="practice-prompt">${escapeHtml(buildBusinessAnalysisPrompt(p))}</div>
+ <p class="small">ChatGPTとの分析終了後、SITE_DATAを「ChatGPTの学習結果を取り込む」へ貼り付けて保存してください。「事業別の学習記録 → ${activeAnalysisBusiness}」へ蓄積されます。</p></div>`;
+ box.scrollIntoView({behavior:'smooth'});
+}
+async function copyBusinessAnalysisPrompt(id){
+ const p=PRACTICE_ITEMS.find(x=>x.id===id),txt=buildBusinessAnalysisPrompt(p);
+ try{await navigator.clipboard.writeText(txt);setBizAnalysisStatus(activeAnalysisBusiness,id,'進行中');alert('事業分析プロンプトをコピーしました。ChatGPTに貼り付けて分析を開始してください。')}
+ catch(e){prompt('このプロンプトをコピーしてください',txt)}
+}
+function openBusinessAnalysisSection(b){activeAnalysisBusiness=b;renderBusinessAnalysisMode();document.getElementById('businessAnalysisMode').scrollIntoView({behavior:'smooth'})}
+function initBusinessAnalysisMode(){try{renderBusinessAnalysisMode()}catch(e){console.error('Business Analysis init error',e)}}
 const PRACTICE_ITEMS=[
  {id:'pest',title:'PEST',theme:'戦略・外部環境',desc:'空港一般ごみに影響する外部変化を整理',steps:['外部変化を自分で3〜5個挙げる','P/E/S/Tへ分類する','事実と仮説を分ける','売上・コスト・処理量・人員への影響を考える','機会／脅威を判断する','最重要変化TOP3を決める','経営として確認・判断することを1つ決める']},
  {id:'fiveforces',title:'Five Forces',theme:'競争・強み弱み',desc:'業界収益性を左右する5つの圧力を自分で評価',steps:['競争業者を挙げる','新規参入障壁を考える','代替手段を考える','顧客側の交渉力を考える','人材・燃料・車両等の供給側を考える','各圧力を強・中・弱で仮評価','利益率への影響と対策を決める']},
@@ -1182,6 +1307,7 @@ function jumpDay(iso){
 }
 migrateLegacyData();seedSep2Session();renderMonths();renderDay(getTargetDay());renderBacklog();renderAllWorkspaces();renderLearningDatabase();renderFutureStockSummary();renderBusinessRecords();
 
+function initBusinessAnalysisAfterLoad(){ initBusinessAnalysisMode(); initMedicalAnalysis(); }
 function initSelfPracticeModule(){
   try{
     renderPracticeList();
@@ -1192,9 +1318,10 @@ function initSelfPracticeModule(){
   }
 }
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded', initSelfPracticeModule);
+  document.addEventListener('DOMContentLoaded', ()=>{initSelfPracticeModule();initBusinessAnalysisAfterLoad();});
 }else{
   initSelfPracticeModule();
+  initBusinessAnalysisAfterLoad();
 }
 
 </script>
