@@ -20,7 +20,7 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
 .month-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px} .month-btn{display:flex;width:100%;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid var(--line);padding:12px;border-radius:12px}
 .month-btn:hover{border-color:#9bb5ce;background:#f8fbfe} .month-btn small{display:block;color:var(--muted);margin-top:3px} .num{font-size:11px;background:var(--soft);color:var(--accent);padding:7px;border-radius:9px}
 .week-box{border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0} .week-box h4{margin:0 0 6px}
-.daylist{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px} .daychip{padding:8px 3px;text-align:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:12px;cursor:pointer} .daychip.donechip{background:#eefbf4;border-color:#b7e4ca} .daychip.todaychip{outline:2px solid var(--accent)}
+.daylist{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:12px} .daychip{padding:8px 3px;text-align:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:12px;cursor:pointer} .daychip.donechip{background:#eefbf4;border-color:#b7e4ca} .daychip.todaychip{outline:2px solid var(--accent)}
 .prompt{background:#101828;color:#f2f4f7;border-radius:13px;padding:14px;white-space:pre-wrap;font-size:13px} .hidden{display:none}
 .nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px} .nav button{background:rgba(255,255,255,.14);color:#fff;padding:8px 10px}
 .stat{font-size:28px;font-weight:800} .small{font-size:12px;color:var(--muted)}
@@ -132,8 +132,8 @@ label{display:block;margin:12px 0 6px}
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Daily Dashboard Ver.16</h1>
-<p>医療系廃棄物は学びながら実分析→空港一般ごみは自力再現→他4事業はChatGPT壁打ち分析→全6事業比較。</p>
+<h1>経営者育成｜Daily Dashboard Ver.17</h1>
+<p>全学習を LEARN→THINK→RESEARCH→APPLY→DECIDE→SAVE の6ステップで統一。医療系廃棄物は学びながら実分析、空港一般ごみは自力再現、他4事業は壁打ち分析。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
 <button onclick="showRecords()">学習記録</button>
@@ -146,7 +146,7 @@ label{display:block;margin:12px 0 6px}
 
 <div class="v11-quicknav">
  <button onclick="showToday()">TODAY</button>
- <button onclick="document.getElementById('analysisOverview').scrollIntoView({behavior:'smooth'})">事業分析</button>
+ <button onclick="document.getElementById('analysisOverview').scrollIntoView({behavior:'smooth'})">事業分析</button><button onclick="document.getElementById('standardFlow').scrollIntoView({behavior:'smooth'})">6ステップ</button>
  <button onclick="document.getElementById('businessRecords').scrollIntoView({behavior:'smooth'})">事業別記録</button><button onclick="document.getElementById('selfPractice').scrollIntoView({behavior:'smooth'})">自力演習</button><button onclick="document.getElementById('businessAnalysisMode').scrollIntoView({behavior:'smooth'})">事業分析</button>
  <button onclick="showWorkspace('checkBoard')">確認事項</button>
  <button onclick="document.getElementById('portfolioGoal').scrollIntoView({behavior:'smooth'})">全事業比較</button>
@@ -316,6 +316,24 @@ MEMO=自由メモ
 </section>
 
 
+
+
+<section class="card full" id="standardFlow">
+  <span class="tag">STANDARD FLOW</span>
+  <h2>Daily Session｜6ステップ固定</h2>
+  <p class="muted">今後の学習は「勉強」と「外部環境調査」を分けず、実際の事業分析まで1本の流れで進めます。</p>
+  <div class="practice-steps">
+    <div class="practice-step"><b>① LEARN</b><br>今日の考え方を必要最小限だけ学ぶ</div>
+    <div class="practice-step"><b>② THINK</b><br>まず自分で仮説を考える</div>
+    <div class="practice-step"><b>③ RESEARCH</b><br>ChatGPTと実際の外部環境をWebで確認する</div>
+    <div class="practice-step"><b>④ APPLY</b><br>ナリコーの売上・利益・顧客・人員・設備へ置き換える</div>
+    <div class="practice-step"><b>⑤ DECIDE</b><br>経営として何を判断・確認するか決める</div>
+    <div class="practice-step"><b>⑥ SAVE</b><br>事実・仮説・示唆・宿題をSITE_DATAで保存する</div>
+  </div>
+  <div class="biz-mode-note" style="margin-top:12px">
+    <b>RESEARCHの原則：</b> 外部環境に関するテーマでは、環境省・厚生労働省・国土交通省・自治体・統計・業界団体・企業公式情報など、一次情報を優先して実際にWeb確認します。未確認の内容は「仮説」として残します。
+  </div>
+</section>
 
 <section class="card full" id="medicalRealAnalysis">
 <span class="tag">LEARN + REAL ANALYSIS</span><h2>医療系廃棄物｜学びながら実事業分析</h2>
@@ -1024,15 +1042,19 @@ function medPrompt(p){return `【経営者育成｜学習＋実事業分析】
 目的：${p.title}の考え方を理解すると同時に、株式会社ナリコーの実際の医療系廃棄物事業を分析する。
 
 あなたは講師兼経営コーチとして進行してください。
+
+【6ステップ固定】
+LEARN → THINK → RESEARCH → APPLY → DECIDE → SAVE
+
 【進め方】
 1. 今回の考え方を経営判断に必要な範囲だけ簡潔に教える
 2. 完成した答えは出さず、私に1問だけ質問して仮説を考えさせる
 3. 回答後は「良い点／抜けている視点／次の1問」で壁打ちする
-4. 実際の制度・市場・顧客・競合など外部情報が必要なら、確認事項を示し必要に応じてWeb調査する
-5. 売上・利益・単価・処理量・ルート・設備・人員など社内情報が必要なら、確認すべき数字を具体化する
-6. 事実と仮説を分ける
-7. 売上・利益・コスト・人員・設備・顧客・競争優位・リスクへの影響を考える
-8. 最後は経営への示唆・判断まで進める
+4. RESEARCH工程では、今回のテーマに関係する実際の外部情報をWebで確認する。環境省・厚生労働省・自治体・統計・業界団体・企業公式情報など一次情報を優先する
+5. 確認できた外部情報はFACT、裏付け前の内容はHYPOTHESISとして分ける
+6. 売上・利益・単価・処理量・ルート・設備・人員など社内情報が必要なら、確認すべき数字を具体化する
+7. APPLY工程で、売上・利益・コスト・人員・設備・顧客・競争優位・リスクへの影響を考える
+8. DECIDE工程で、経営として何を判断・確認・実行するかまで進める
 
 【今回の分析ステップ】
 ${p.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}
