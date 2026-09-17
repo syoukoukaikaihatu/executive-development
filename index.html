@@ -129,12 +129,26 @@ label{display:block;margin:12px 0 6px}
 </style>
 <style>
 .weekly-home{display:grid;grid-template-columns:1.55fr .75fr;gap:16px;margin:16px 0}.weekly-main,.weekly-side,.weekly-box{background:#fff;border:1px solid #dbe3ea;border-radius:18px;padding:20px}.weekly-main h2{font-size:25px}.weekly-status{display:inline-block;padding:6px 11px;border-radius:999px;background:#eef5fb;font-weight:800;font-size:13px}.weekly-next{font-size:21px;font-weight:900;margin:16px 0 5px}.weekly-actions,.work-row{display:flex;gap:9px;flex-wrap:wrap}.weekly-actions button{min-height:44px}.weekly-sub{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.work-entry{margin-top:16px;padding:14px;border:1px solid #dbe3ea;border-radius:14px;background:#f8fafc}.work-row input{flex:1;min-width:220px;padding:11px;border:1px solid #ccd7e1;border-radius:10px}.weekly-metric{font-size:30px;font-weight:900}.weekly-label{font-size:12px;font-weight:900;letter-spacing:.05em;color:#365b7d}.site-data-box textarea{width:100%;min-height:210px;resize:vertical}@media(max-width:800px){.weekly-home,.weekly-sub{grid-template-columns:1fr}}</style>
+
+<style>
+/* Ver.21: legacy Weekly Session timetable is retained only for compatibility, not shown */
+#today .steps, #today .step-grid, #today .daily-steps,
+#dailySession .steps, #dailySession .step-grid, #dailySession .daily-steps {display:none!important}
+.v21-learning-card{background:#fff;border:1px solid #dbe3ea;border-radius:18px;padding:20px;margin:16px 0}
+.v21-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0}
+.v21-flow>div{border:1px solid #dbe3ea;border-radius:13px;padding:13px;background:#f8fafc;min-height:92px}
+.v21-flow b{display:block;margin-bottom:6px}
+.v21-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.v21-note{font-size:13px;color:#536474;margin-top:10px}
+@media(max-width:850px){.v21-flow{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <small>PRIVATE / DAILY EXECUTIVE DEVELOPMENT</small>
-<h1>経営者育成｜Executive Development Ver.20｜Weekly</h1>
+<h1>経営者育成｜Executive Development Ver.21｜Weekly</h1>
 <p>週1回を基本に、15〜30分で経営判断力を積み上げる。実際の仕事で経営課題を分析した時間も、経営者育成として記録できます。</p>
 <div class="nav">
 <button onclick="showToday()">今日</button>
@@ -170,7 +184,7 @@ label{display:block;margin:12px 0 6px}
 <h3>完了したら</h3>
 <div class="row">
 <button class="done" onclick="document.querySelector('.completion-panel')?.scrollIntoView({behavior:'smooth'})">✓ 終了条件を確認</button>
-<button class="secondary" onclick="copyPrompt()">今日の学習を1つのチャットで始める</button>
+<button class="secondary" onclick="copyPrompt()">今回の学習を1つのチャットで始める</button>
 </div>
 <p class="small">開始文をコピーします。このチャットに貼り付けると、今日のテーマ・自社調査項目・ゴールに沿って対話形式の学習を開始できます。</p>
 </section>
@@ -195,7 +209,7 @@ MEMO:
 <div class="import-box">
  <span class="tag">CHATGPT IMPORT</span>
  <h3>ChatGPTの学習結果を取り込む</h3>
- <p class="import-help">Daily Session終了時にChatGPTが出した <b>===SITE_DATA_START=== から ===SITE_DATA_END=== まで</b>をそのままコピーして貼り付けてください。サイトは固定キーだけを読み取るため、文章の長さや内容に左右されません。</p>
+ <p class="import-help">Weekly Session終了時にChatGPTが出した <b>===SITE_DATA_START=== から ===SITE_DATA_END=== まで</b>をそのままコピーして貼り付けてください。サイトは固定キーだけを読み取るため、文章の長さや内容に左右されません。</p>
  <textarea id="chatgptImport" rows="7" placeholder='ここにChatGPTのサイト保存用データを貼り付け'></textarea>
  <div class="row" style="margin-top:8px">
   <button class="primary" onclick="importChatGPTResult()">ChatGPTのまとめを取り込む</button>
@@ -237,11 +251,11 @@ MEMO=自由メモ
 <label><b>③ 自分の仮説・まだ未確認のこと</b></label>
 <textarea id="noteHypothesis" rows="4" placeholder="現時点で『こうではないか』と考えていること"></textarea>
 <label><b>④ 経営への示唆</b></label>
-<textarea id="noteAction" rows="4" placeholder="今日の学習を自社の経営判断にどう活かすか"></textarea></div>
+<textarea id="noteAction" rows="4" placeholder="今回の学習を自社の経営判断にどう活かすか"></textarea></div>
 <div class="next-zone"><h3>次につなげる</h3>
 <div class="homework-card"><label><b>⑤ 次回までの宿題｜1つだけ</b></label>
 <textarea id="noteHomework" rows="2" placeholder="次に実際に確認・行動することを1つだけ"></textarea>
-<p class="small">次回のDaily Session冒頭で進捗を確認します。未完了でも次の学習には進めます。</p></div>
+<p class="small">次回のWeekly Session冒頭で進捗を確認します。未完了でも次の学習には進めます。</p></div>
 <div class="future-stock"><label><b>⑥ 今後確認すること｜ストック</b></label>
 <textarea id="noteFuture" rows="4" placeholder="1行に1項目：調べたい数字／社内資料／担当者確認／外部情報など"></textarea>
 <p class="small">ここに入れた項目は宿題ではありません。関連するテーマで再度取り上げます。</p></div></div>
@@ -258,7 +272,7 @@ MEMO=自由メモ
 
 <section class="card full workspace-board" id="homeworkBoard">
 <span class="tag">HOMEWORK</span><h2>宿題</h2>
-<p class="muted">Daily Sessionから生まれた「次に実際に確認・行動すること」を管理します。未完了でも学習は止めません。</p>
+<p class="muted">Weekly Sessionから生まれた「次に実際に確認・行動すること」を管理します。未完了でも学習は止めません。</p>
 <div id="homeworkList"></div>
 </section>
 
@@ -271,7 +285,7 @@ MEMO=自由メモ
 
 <section class="card full workspace-board" id="issueBoard">
 <span class="tag">MANAGEMENT ISSUES</span><h2>経営課題・重要テーマ</h2>
-<p class="muted">1日で終わらない中長期の経営テーマを追い続ける場所です。Daily Sessionの論点を自動では登録せず、重要と判断したものだけ登録します。</p>
+<p class="muted">1日で終わらない中長期の経営テーマを追い続ける場所です。Weekly Sessionの論点を自動では登録せず、重要と判断したものだけ登録します。</p>
 <div class="issue-create">
 <input id="issueTitle" placeholder="経営課題のタイトル">
 <textarea id="issueBody" rows="3" placeholder="背景・現状・目標・現在の仮説など"></textarea>
@@ -339,13 +353,31 @@ MEMO=自由メモ
 <div class="work-entry"><b>実務テーマで学習</b><p class="muted">実際の仕事上の経営課題も、経営者育成1回として蓄積できます。</p>
 <div class="work-row"><input id="workTopicInput" placeholder="例：新工場への設備投資／人材流出／顧客別採算"><button class="secondary" onclick="startWorkLearning()">実務テーマのプロンプトをコピー</button></div></div></div>
 <div class="weekly-side"><div class="weekly-label">累計進捗</div><div class="weekly-metric" id="weeklyCompletedCount">0</div><div class="muted">保存済み学習記録</div><hr><div class="weekly-label">学習ルール</div><p><b>週1回が基本</b><br>最大30分／忙しい日は15分。</p><p class="muted">未実施分は翌週へ繰り越しません。・の評価もしません。</p></div></section>
+
+<section class="v21-learning-card" id="weeklyLearning">
+  <span class="tag">WEEKLY SESSION</span>
+  <h2>今回の学習｜15〜30分</h2>
+  <p>細かな時間配分は管理しません。ChatGPTとの1つの対話で、STEP5まで進めます。</p>
+  <div class="v21-flow">
+    <div><b>STEP1｜学ぶ</b>今日のテーマを、経営判断に必要な範囲だけ理解する。</div>
+    <div><b>STEP2｜考える</b>一問ずつ対話し、まず自分の仮説を持つ。</div>
+    <div><b>STEP3｜自社に当てはめる</b>必要な場合だけChatGPTがWeb検索し、実際の事業・仕事へ置き換える。</div>
+    <div><b>STEP4｜次を決める</b>経営上の示唆、行動、確認事項のいずれかを原則1つ決める。</div>
+    <div><b>STEP5｜保存</b>最後にSITE_DATAを出し、サイトへ貼って終了する。</div>
+  </div>
+  <div class="v21-actions">
+    <button class="primary" onclick="startWeeklyLearning(30)">ChatGPT学習プロンプトをコピー</button>
+    <button class="secondary" onclick="startWeeklyLearning(15)">15分版をコピー</button>
+  </div>
+  <div class="v21-note">通常は30分以内。忙しい日は15分版でも必ずSTEP5まで完了します。Web調査は独立した作業にせず、必要なテーマのSTEP3内で行います。</div>
+</section>
+
 <section class="weekly-sub"><div class="weekly-box"><div class="weekly-label">最近の学習</div><div id="weeklyRecent">まだ記録はありません。</div></div>
 <div class="weekly-box"><div class="weekly-label">次のテーマ</div><div id="weeklyNextCard">ロードマップから次の未完了テーマを表示します。</div></div></section>
-<section class="card full"><span class="tag">15–30 MINUTES</span><h2>1回でSTEP5まで完了</h2><div class="practice-steps">
-<div class="practice-step"><b>STEP1｜学ぶ</b><br>必要な範囲だけ理解</div><div class="practice-step"><b>STEP2｜考える</b><br>一問ずつ対話し仮説を持つ</div><div class="practice-step"><b>STEP3｜自社に当てはめる</b><br>必要ならWeb検索して実務へ置換</div><div class="practice-step"><b>STEP4｜次の行動</b><br>判断・確認事項を1つ決める</div><div class="practice-step"><b>STEP5｜保存</b><br>SITE_DATAを貼って終了</div></div></section>
+
 <section class="card full" id="standardFlow" style="display:none">
   <span class="tag">STANDARD FLOW</span>
-  <h2>Daily Session｜6ステップ固定</h2>
+  <h2>Weekly Session｜6ステップ固定</h2>
   <p class="muted">サイトで今日の1プロンプトを取得したら、同じChatGPTチャット内で30分以内に「学習・外部環境調査・自社への当て込み・経営判断」まで完結します。深掘りしきれない内容はFUTUREへ送り、サイトへ戻るのは最後の保存時だけです。</p>
   <div class="practice-steps">
     <div class="practice-step"><b>① LEARN</b><br>今日の考え方を必要最小限だけ学ぶ</div>
@@ -396,7 +428,7 @@ MEMO=自由メモ
 
 <section class="card full" id="learningDatabase">
  <span class="tag">LEARNING DATABASE</span><h2>学習記録を振り返る</h2>
- <p class="muted">保存済みDaily Sessionをキーワード・対象事業・分析テーマで探せます。9月2日の復元記録もここに表示されます。</p>
+ <p class="muted">保存済みWeekly Sessionをキーワード・対象事業・分析テーマで探せます。9月2日の復元記録もここに表示されます。</p>
  <div class="archive-filter">
   <input id="dbKeyword" placeholder="例：回収ルート、PEST、処理能力" oninput="renderLearningDatabase()">
   <select id="dbBusiness" onchange="renderLearningDatabase()"><option value="">すべての事業</option><option>医療系廃棄物</option><option>成田空港一般ごみ</option><option>空港メンテナンス</option><option>土木・建築</option><option>セレモニー</option><option>飲食</option><option>全社・共通</option></select>
@@ -702,7 +734,7 @@ function precisePromptFor(d){
   const external=x.external.slice(0,3).map(v=>`・${v}`).join('\n');
   const nums=x.numbers.slice(0,4).map(v=>`・${v}`).join('\n');
 
-  return `【経営者育成 Daily Session】
+  return `【経営者育成 Weekly Session】
 日付：${d.jp}
 今月：${d.month_title}
 今週：${d.week_title}
@@ -730,7 +762,7 @@ function precisePromptFor(d){
 
 【今日の進め方】
 あなたは講師兼経営コーチとして進行してください。
-この1つのチャットだけで今日の学習を完結させてください。途中で別プロンプトや別チャットに分けないでください。
+この1つのチャットだけで今回の学習を完結させてください。途中で別プロンプトや別チャットに分けないでください。
 全工程を原則30分以内で終えてください。外部調査は重要2〜3点まで、経営への示唆は原則1つまでとし、時間内に追い切れない内容はFUTUREへ送ってください。
 私が仮説を考えた後、外部情報が関係するテーマではChatGPT自身がWeb検索し、一次情報を優先して事実確認してください。
 調査結果は必ずナリコーの実事業へ当て込み、売上・利益・顧客・人員・設備・競争優位・リスクへの影響と経営判断まで進めてください。
@@ -801,7 +833,7 @@ MEMO=自由メモ
 BUSINESSは「医療系廃棄物／成田空港一般ごみ／空港メンテナンス／土木・建築／セレモニー／飲食／全社・共通」から選んでください。
 ユーザーはSTARTからENDまでをそのままコピーしてサイトへ貼り付けます。
 
-それでは、今日の学習を開始してください。
+それでは、今回の学習を開始してください。
 最初の質問を1つだけ出してください。`;
 }
 
@@ -1038,7 +1070,7 @@ function seedSep2Session(){
   action:`医療系廃棄物事業では、単純なシェア拡大・低価格での数量獲得より、既存顧客・回収ルート・処理能力の収益性改善を優先する。\nまず既存の約50億円の売上の中にある「隠れた利益」を把握し、ルート効率化、自動化、予防保全、顧客・案件別採算の改善を進める。そのうえで余力を高採算案件へ配分する。`,
   homework:`医療系廃棄物の回収ルートが現在どのように決められているか担当者に確認し、ルート別の売上・処理量・距離・時間・人員などのデータが取得可能か確認する。`,
   future:`処理能力・保管能力と実稼働率を確認する\n主要顧客・ルート別の売上、処理量、単価、採算を確認する\n県内シェア約70％という認識の根拠を確認する\n空港旅客数と成田空港一般ごみ処理量の関係を分析する\n競合事業者の処理施設、許可品目、営業地域、サービス内容を整理する\n新工場稼働後の維持修繕費・固定費・返済余力を確認する`,
-  memo:`9月2日 Daily Session復元記録。外部環境と内部環境をつなぎ、シェア拡大より収益性改善を優先する方向性を検討。`,
+  memo:`9月2日 Weekly Session復元記録。外部環境と内部環境をつなぎ、シェア拡大より収益性改善を優先する方向性を検討。`,
   updated_at:'2026-09-02T23:59:00+09:00', seeded:true
  };
  // 既存の9/2記録がある場合は上書きせず、空欄だけ補完する。
@@ -1079,7 +1111,7 @@ function medPrompt(p){return `【経営者育成｜学習＋実事業分析】
 RESEARCHに入ったら、私に検索を丸投げせず、ChatGPT自身が利用可能なWeb検索を使って調査してください。
 
 【30分タイムボックス｜厳守】
-このDaily Sessionは原則30分以内で終了してください。
+このWeekly Sessionは原則30分以内で終了してください。
 ・0〜5分：LEARN。今日のテーマを経営判断に必要な範囲だけ簡潔に説明
 ・5〜10分：THINK。質問は一度に1問。私がまず仮説を出す
 ・10〜18分：RESEARCH。Web調査は今日の判断に重要な2〜3点だけ。一次情報を優先し、網羅調査をしない
@@ -1133,7 +1165,7 @@ function renderMedicalAnalysis(){
 }
 function openMedicalAnalysis(id){
  const p=PRACTICE_ITEMS.find(x=>x.id===id);if(!p)return;const box=document.getElementById('medicalAnalysisDetail');box.dataset.id=id;const s=medStatus(id);
- box.innerHTML=`<div class="practice-detail"><div class="record-head"><div><h3 style="margin:0">医療系廃棄物｜${p.title}</h3><small>考え方の学習＋実際の事業分析</small></div><span class="practice-status ${s==='完了'?'done':s==='進行中'?'progress':''}">${s}</span></div><div class="practice-steps">${p.steps.map((x,i)=>`<div class="practice-step"><b>${i+1}</b> ${x}</div>`).join('')}</div><div class="row" style="margin-top:12px"><button class="primary" onclick="copyMedPrompt('${id}')">ChatGPTで学習＋分析を始める</button><button class="secondary" onclick="setMedStatus('${id}','進行中')">進行中にする</button><button class="done" onclick="setMedStatus('${id}','完了')">完了にする</button></div><div class="practice-prompt">${escapeHtml(medPrompt(p))}</div><p class="small">終了後のSITE_DATAは「事業別の学習記録 → 医療系廃棄物」に保存します。Daily Sessionの内容も実事業分析の材料として蓄積します。</p></div>`;box.scrollIntoView({behavior:'smooth'});
+ box.innerHTML=`<div class="practice-detail"><div class="record-head"><div><h3 style="margin:0">医療系廃棄物｜${p.title}</h3><small>考え方の学習＋実際の事業分析</small></div><span class="practice-status ${s==='完了'?'done':s==='進行中'?'progress':''}">${s}</span></div><div class="practice-steps">${p.steps.map((x,i)=>`<div class="practice-step"><b>${i+1}</b> ${x}</div>`).join('')}</div><div class="row" style="margin-top:12px"><button class="primary" onclick="copyMedPrompt('${id}')">ChatGPTで学習＋分析を始める</button><button class="secondary" onclick="setMedStatus('${id}','進行中')">進行中にする</button><button class="done" onclick="setMedStatus('${id}','完了')">完了にする</button></div><div class="practice-prompt">${escapeHtml(medPrompt(p))}</div><p class="small">終了後のSITE_DATAは「事業別の学習記録 → 医療系廃棄物」に保存します。Weekly Sessionの内容も実事業分析の材料として蓄積します。</p></div>`;box.scrollIntoView({behavior:'smooth'});
 }
 async function copyMedPrompt(id){const p=PRACTICE_ITEMS.find(x=>x.id===id),t=medPrompt(p);try{await navigator.clipboard.writeText(t);setMedStatus(id,'進行中');alert('学習＋実事業分析プロンプトをコピーしました。')}catch(e){prompt('このプロンプトをコピーしてください',t)}}
 function initMedicalAnalysis(){try{renderMedicalAnalysis()}catch(e){console.error(e)}}
@@ -1405,12 +1437,13 @@ function promptFor(theme,goal,min){return `私は執行役員として、週1回
 
 【時間】
 最大${min}分でSTEP5まで必ず完了してください。
+細かな分単位の時間管理は不要です。時間内にSTEP5まで到達することを優先してください。
 ${min===15?'今日は15分版です。説明量と調査量を圧縮し、最後の保存まで進めてください。':'30分以内で完了してください。'}
 
 【進め方】
 STEP1｜学ぶ：経営判断に必要な範囲だけ簡潔に説明する。
 STEP2｜考える：一方的に講義せず、一度に1問だけ質問する。私が先に仮説を考える。
-STEP3｜自社に当てはめる：最新情報が必要ならChatGPT自身がWeb検索し、官公庁・自治体・統計・業界団体・企業公式情報など一次情報を優先する。そのうえで実際の自社事業・仕事へ当てはめる。
+STEP3｜自社に当てはめる：自社への当て込みに最新情報が必要な場合だけ、同じチャット内でChatGPT自身がWeb検索する。官公庁・自治体・統計・業界団体・企業公式情報など一次情報を優先し、外部調査を別作業・別プロンプトにしない。そのうえで実際の自社事業・仕事へ当てはめる。
 STEP4｜次の行動・確認事項を決める：経営判断につながる示唆、確認する数字・事実、または行動を原則1つに絞る。
 STEP5｜保存：最後に必ず下記形式を出力する。
 
